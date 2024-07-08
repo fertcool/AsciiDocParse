@@ -7,7 +7,7 @@ import abc
 
 class Visitor(abc.ABC):
     pass
-    """ abc methods for all AST implement blocks
+    """ abc methods for all AST implemented blocks
     
     @abc.abstractmethod
     def visit_some_block1():
