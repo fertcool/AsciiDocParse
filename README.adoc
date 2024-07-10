@@ -1,0 +1,235 @@
+= Quick Start: Parsing AsciiDoc with Python
+
+The adparser library for Python provides powerful capabilities for working with AsciiDoc documents. In this Quick Start, you'll learn how to use the library's main functions to extract various elements from an AsciiDoc document.
+
+== Installation
+Install the asciidoc library using pip:
+[source,bash]
+pip install adparser
+
+== Extracting Document Elements
+The asciidoc library can extract the following elements from an AsciiDoc document:
+
+* text lines (text_line)
+* link (links)
+* paragraphs (paragraph)
+* sections (section)
+* headings (heading)
+* lists (list)
+* source blocks (source)
+* tables (table)
+* admonition blocks (note, tip, important, warning, caution)
+* audio, video, and images. (audio, video, image)
+
+To access these elements, you can use the Parser object.
+
+== Parser object
+
+To start parsing, we need to create Parser object:
+
+[source, python]
+----
+from adparser import Parser
+my_file = open(test.adoc)
+parser = Parser(my_file)
+----
+
+The first parameter can be either the file descriptor or the source text of the asciidoc document. This constructor also has named parameters *link_opt* and *table_format*.
+
+link_opt can be:
+
+* 'show_links'
+* 'hide_links'
+
+This option can hide the url of a link or hyperlink or show it. The default is 'hide_link'
+
+table_format can be:
+
+* 'matrix'
+* 'dict'
+
+Sets the format of the table object that you can work with further. The default is 'matrix'
+
+[source, python]
+----
+from adparser import Parser
+my_file = open(test.adoc)
+parser = Parser(my_file, table_format='dict')
+----
+In this code the parser object will not leave links in the document elements and the table format will be a dictionary.
+
+== Parser methods
+
+To work with each of the document elements described above, the Parser object has its own methods.
+
+=== Example
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+This is a paragraph.
+
+== Section 1
+
+This is another paragraph.
+
+[source,python]
+print("Hello, World!")
+
+[NOTE]
+This is a note.
+
+image::image.png[]
+
+----
+
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open(test.adoc)
+... parser = Parser(my_file)
+
+>>> for docelem in parser.heading():
+...     print(docelem.data)
+'Document Title'
+'Document Title -> Section 1'
+>>> for docelem in parser.source():
+...     print(docelem.data)
+...     print(docelem.style)
+'print("Hello, World!")'
+'python'
+
+----
+
+
+The functions return an iterators for the objects-elements of the document.  They store the following attributes:
+
+* data: The data associated with the element (usually the text content, or a marix/dict for tables)
+* section: The section of the document the element belongs to
+* style: The style of the object (if element is source)
+
+
+=== How get tables:
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+[cols="1,1"]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|===
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open(test.adoc)
+... parser = Parser(my_file)
+>>> elemiter = parser.table()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data[0][0])
+'Cell in column 1, row 1'
+>>> print(elemiter.data[1][0])
+'Cell in column 2, row 1'
+
+----
+
+The table objects also have the to_dict() and to_matrix() methods. Which change the data attribute.
+
+[source, python]
+----
+>>> elemiter.to_dict()
+>>> print(elemiter.data["row1"])
+['Cell in column 1, row 1', 'Cell in column 2, row 1']
+
+----
+Keys with the names "row1" and "row2" were automatically created
+[source,asciidoc]
+.test1.adoc
+----
+
+= Document Title
+
+[cols="1,1"]
+[cols="3,3,3,3"]
+|===
+|Column 1 |Column 2 |Column 3 |Column 4
+
+|Cell in column 1
+|Cell in column 2
+|Cell in column 3
+|Cell in column 4
+|===
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open(test1.adoc)
+... parser = Parser(my_file, table_format='dict')
+>>> elemiter = parser.table()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data["Column 1"])
+["Cell in column 1"]
+>>> elemiter.to_matrix()
+>>> print(elemiter.data[0][0])
+'Column 1'
+>>> print(elemiter.data[0][1])
+'Cell in column 1'
+----
+The first element in the column becomes the column name
+
+=== get_near_up() and get_near_down() methods
+
+To access the closest element to the current one, there are methods get_near_up() and get_near_down(). The accepted parameter is a string with the name of the required element.
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+This is a paragraph.
+
+== Section 1
+
+This is another paragraph.
+
+[source,python]
+print("Hello, World!")
+
+[NOTE]
+This is a note.
+
+image::image.png[]
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open(test.adoc)
+... parser = Parser(my_file)
+>>> for docelem in parser.source():
+...     up_heading = docelem.get_near_up("heading")
+...     print(up_heading.data)
+...     down_image = docelem.get_near_down("image")
+...     print(down_image.data)
+'Document Title -> Section 1'
+'image.png'
+----
+

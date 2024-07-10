@@ -1,8 +1,8 @@
 # AST for AsciiDoc document
 
-from src.ADParser.AST.Blocks import Block
-from src.ADParser.Visitors import Visitor
-import src.ADParser.AST.Scaners
+from src.adparser.AST.Blocks import Blocks
+from src.adparser.Visitors import Visitor
+import src.adparser.AST.Scaners
 
 
 class ASTree:

@@ -3,7 +3,7 @@
 # the constructed tree may be different for each implementation
 
 import abc
-from src.ADParser.AST.Blocks import Block
+from src.adparser.AST.Blocks import Blocks
 
 
 class Scaner(abc.ABC):
