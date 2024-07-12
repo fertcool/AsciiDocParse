@@ -19,39 +19,36 @@ class Parser:
 
     """the functions create a visitor, dfs with this visitor returns an iterator to the blocks"""
 
-    def text_lines(self, style=None) -> BlockIterator:
+    def text_lines(self, style=None, section=None) -> BlockIterator:
         pass
 
-    def links(self) -> BlockIterator:
+    def links(self, section=None) -> BlockIterator:
         pass
 
-    def paragraphs(self, style=None) -> BlockIterator:
+    def paragraphs(self, style=None, section=None) -> BlockIterator:
         pass
 
-    def sections(self) -> BlockIterator:
+    def headings(self, section=None) -> BlockIterator:
         pass
 
-    def headings(self) -> BlockIterator:
+    def lists(self, section=None) -> BlockIterator:
         pass
 
-    def lists(self) -> BlockIterator:
+    def source_blocks(self, style=None, section=None) -> BlockIterator:
         pass
 
-    def source_blocks(self, style=None) -> BlockIterator:
+    def tables(self, section=None) -> BlockIterator:
         pass
 
-    def tables(self) -> BlockIterator:
+    def admonition_blocks(self, style=None, section=None) -> BlockIterator:
         pass
 
-    def admonition_blocks(self, style=None) -> BlockIterator:
+    def audios(self, section=None) -> BlockIterator:
         pass
 
-    def audios(self) -> BlockIterator:
+    def images(self, section=None) -> BlockIterator:
         pass
 
-    def images(self) -> BlockIterator:
-        pass
-
-    def video(self) -> BlockIterator:
+    def video(self, section=None) -> BlockIterator:
         pass
 

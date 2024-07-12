@@ -12,5 +12,9 @@ class ASTree:
         """scaner = Scaner()
         self.head: Block = scaner.build_AST(sourcetext)"""
 
+    @staticmethod
+    def _add_sub_element(self, parent: Block, newchild: Block):
+        parent.children.append(newchild)
+
     def dfs(self, visitor: Visitor) -> BlockIterator:
         pass

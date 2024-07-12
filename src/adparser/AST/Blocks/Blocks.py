@@ -10,23 +10,26 @@ class Block(abc.ABC):
         self.section = section
         self.data = data
         self._parent = parent
-        self._children: list = None  # list of children blocks
+        self.children: list = None  # list of children blocks
 
 
     @abc.abstractmethod
     def accept(self, visitor: Visitor):
         pass
 
-    def get_near_up(self, element: str):
+    def get_near_up(self, element: str, style=None):
         pass
 
-    def get_near_down(self, element: str):
+    def get_near_down(self, element: str, style=None):
         pass
 
 
 """blocks classes description"""
 
+class RootBlock(Block):
 
+    def __init__(self):
+        super().__init__(None, )
 class TextLine(Block):
     from src.adparser.Visitors import Visitor
 
@@ -63,8 +66,8 @@ class Paragraph(Block):
 class Section(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent):
-        super().__init__(data, section, parent)
+    def __init__(self, section, parent):
+        super().__init__(None, section, parent)
 
     def accept(self, visitor: Visitor):
         pass

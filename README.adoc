@@ -13,7 +13,6 @@ The asciidoc library can extract the following elements from an AsciiDoc documen
 * text lines (text_line) - the basic element, all the others are made up of it
 * link (links)
 * paragraphs (paragraph)
-* sections (section)
 * headings (heading)
 * lists (list)
 * source blocks (source)
@@ -113,7 +112,7 @@ List of styles:
 * source
 ** ...
 
-You can set a named style parameter for these methods for a more accurate selection.
+You can set a named *style* and *section* parameters for these methods for a more accurate selection.
 
 [source,asciidoc]
 .test.adoc
@@ -121,8 +120,12 @@ You can set a named style parameter for these methods for a more accurate select
 
 = Document Title
 
+== Python
+
 [source,python]
 print("Hello, World!")
+
+== C++
 
 [source,cpp]
 std::cout << "Hello, World!";
@@ -139,7 +142,10 @@ std::cout << "Hello, World!";
 ...     print(docelem.style)
 'std::cout << "Hello, World!";'
 'cpp'
+>>> for docelem in parser.sources(section='Document Title->Python'):
+...     print(docelem.data)
 
+'print("Hello, World!")'
 ----
 
 === How get tables:
