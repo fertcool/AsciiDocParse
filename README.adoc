@@ -17,7 +17,6 @@ The asciidoc library can extract the following elements from an AsciiDoc documen
 * lists (list)
 * source blocks (source)
 * tables (table)
-* admonition blocks (note, tip, important, warning, caution)
 * audio, video, and images. (audio, video, image)
 
 To access these elements, you can use the Parser object.
@@ -106,11 +105,23 @@ The functions return an iterators for the objects-elements of the document.  The
 List of styles:
 
 * text_line
-** ...
-* paragraph
-** ...
+** italic
+** bold
+** monospace
+
 * source
-** ...
+** source languages
+* for all elements admonition styles
+** note
+** tip
+** caution
+** warning
+* for all elements area style
+** sidebar
+** example
+** quote
+** listning
+** literal
 
 You can set a named *style* and *section* parameters for these methods for a more accurate selection.
 
@@ -192,11 +203,11 @@ The table objects also have the *data.marix* and *data.dict* attributes.
 [source, python]
 ----
 
->>> print(elemiter.data.dict["row1"])
-['Cell in column 1, row 1', 'Cell in column 2, row 1']
+>>> print(elemiter.data.dict["col1"])
+['Cell in column 1, row 1', 'Cell in column 1, row 2', 'Cell in column 1, row 3']
 
 ----
-Keys with the names "row1" and "row2" were automatically created
+Keys with the names "col1" and "col2" were automatically created
 [source,asciidoc]
 .test1.adoc
 ----
