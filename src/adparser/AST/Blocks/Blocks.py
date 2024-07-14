@@ -6,12 +6,27 @@ from dataclasses import dataclass
 class Block(abc.ABC):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent):
-        self.section = section
+    def __init__(self, data, section, parent, style):
+        if not section:
+            self.section = []
+        else:
+            self.section = section
+
+        if not style:
+            self.styles = []
+        else:
+            self.styles = style
+
         self.data = data
         self._parent = parent
-        self.children: list = None  # list of children blocks
 
+
+
+        self.children: list = []  # list of children blocks
+
+    def add_style(self, style):
+        if style:
+            self.styles.append(style)
 
     @abc.abstractmethod
     def accept(self, visitor: Visitor):
@@ -26,16 +41,32 @@ class Block(abc.ABC):
 
 """blocks classes description"""
 
-class RootBlock(Block):
 
-    def __init__(self):
-        super().__init__(None, )
+class RootBlock(Block):
+    from src.adparser.Visitors import Visitor
+
+    def __init__(self, section=None):
+        super().__init__(None, section, None, None)
+
+    def accept(self, visitor: Visitor):
+        pass
+
+
+class DelimeterBlock(Block):
+    from src.adparser.Visitors import Visitor
+
+    def __init__(self, section, parent, style):
+        super().__init__(None, section, parent, style)
+
+    def accept(self, visitor: Visitor):
+        pass
+
+
 class TextLine(Block):
     from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style=None):
-        super().__init__(data, section, parent)
-        self.style = style
+        super().__init__(data, section, parent, style)
 
     def accept(self, visitor: Visitor):
         pass
@@ -44,8 +75,8 @@ class TextLine(Block):
 class Link(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent, attribute):
-        super().__init__(data, section, parent)
+    def __init__(self, data, section, parent, style, attribute):
+        super().__init__(data, section, parent, style)
         self.attribute = attribute
 
     def accept(self, visitor: Visitor):
@@ -56,8 +87,7 @@ class Paragraph(Block):
     from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style=None):
-        super().__init__(data, section, parent)
-        self.style = style
+        super().__init__(data, section, parent, style)
 
     def accept(self, visitor: Visitor):
         pass
@@ -67,7 +97,7 @@ class Section(Block):
     from src.adparser.Visitors import Visitor
 
     def __init__(self, section, parent):
-        super().__init__(None, section, parent)
+        super().__init__(None, section, parent, None)
 
     def accept(self, visitor: Visitor):
         pass
@@ -76,8 +106,8 @@ class Section(Block):
 class Heading(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent):
-        super().__init__(data, section, parent)
+    def __init__(self, data, section, parent, style=None):
+        super().__init__(data, section, parent, style)
 
     def accept(self, visitor: Visitor):
         pass
@@ -86,8 +116,8 @@ class Heading(Block):
 class List(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent):
-        super().__init__(data, section, parent)
+    def __init__(self, data, section, parent, style):
+        super().__init__(data, section, parent, style)
 
     def accept(self, visitor: Visitor):
         pass
@@ -96,8 +126,8 @@ class List(Block):
 class SourceBlock(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent, style=None):
-        super().__init__(data, section, parent)
+    def __init__(self, data, section, parent, style):
+        super().__init__(data, section, parent, style)
         self.style = style
 
     def accept(self, visitor: Visitor):
@@ -113,8 +143,8 @@ class MatDict:
 class Table(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, matrix, diction, section, parent):
-        super().__init__(None, section, parent)
+    def __init__(self, matrix, diction, section, parent, style=None):
+        super().__init__(None, section, parent, style)
         self.data = MatDict(matrix, diction)
 
     def accept(self, visitor: Visitor):
@@ -124,9 +154,8 @@ class Table(Block):
 class Admonition(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent, style=None):
-        super().__init__(data, section, parent)
-        self.style = style
+    def __init__(self, section, parent, style):
+        super().__init__(None, section, parent, style)
 
     def accept(self, visitor: Visitor):
         pass
@@ -135,8 +164,8 @@ class Admonition(Block):
 class Audio(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent):
-        super().__init__(data, section, parent)
+    def __init__(self, data, section, parent, style):
+        super().__init__(data, section, parent, style)
 
     def accept(self, visitor: Visitor):
         pass
@@ -145,8 +174,8 @@ class Audio(Block):
 class Image(Block):
     from src.adparser.Visitors import Visitor
 
-    def __init__(self, data, section, parent):
-        super().__init__(data, section, parent)
+    def __init__(self, data, section, parent, style):
+        super().__init__(data, section, parent, style)
 
     def accept(self, visitor: Visitor):
         pass

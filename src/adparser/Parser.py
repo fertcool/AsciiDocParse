@@ -1,6 +1,6 @@
 
 from src.adparser.AST.Blocks.BlockIterator import BlockIterator
-from src.adparser.AST.ASTree import ASTree
+from src.adparser.AST.Scaners.HTMLScaner import HTMLScaner
 
 
 class Parser:
@@ -15,7 +15,9 @@ class Parser:
 
         self.link_opt = link_opt
 
-        self.astree = ASTree(self.content)
+        scaner = HTMLScaner()
+        self.astree = scaner.build_AST(self.content)
+        pass
 
     """the functions create a visitor, dfs with this visitor returns an iterator to the blocks"""
 
