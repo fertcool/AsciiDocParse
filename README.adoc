@@ -10,7 +10,7 @@ pip install adparser
 == Extracting Document Elements
 The asciidoc library can extract the following elements from an AsciiDoc document:
 
-* text lines (text_line) - the basic element, all the others are made up of it
+* text lines (text_line) - the paragraph element are made up of it
 * link (links)
 * paragraphs (paragraph)
 * headings (heading)
@@ -32,26 +32,22 @@ my_file = open(test.adoc)
 parser = Parser(my_file)
 ----
 
-The first parameter can be either the file descriptor or the source text of the asciidoc document. This constructor also has named parameter *link_opt*.
 
-link_opt can be:
-
-* 'show_links'
-* 'hide_links'
-
-This option can hide the url of a link or hyperlink or show it. The default is 'hide_link'
-
-
-[source, python]
-----
-from adparser import Parser
-my_file = open(test.adoc)
-parser = Parser(my_file, link_opt='show_links')
-----
 
 == Parser methods
 
-To work with each of the document elements described above, the Parser object has its own methods.
+To work with each of the document elements described above, the Parser object has its own methods:
+
+* text_lines()
+* links()
+* paragraphs()
+* headings
+* lists
+* source_blocks()
+* tables()
+* audios()
+* images()
+* videos()
 
 === Example
 
@@ -86,21 +82,21 @@ image::image.png[]
 >>> for docelem in parser.headings():
 ...     print(docelem.data)
 'Document Title'
-'Document Title -> Section 1'
+'Section 1'
 >>> for docelem in parser.sources():
 ...     print(docelem.data)
-...     print(docelem.style)
+...     print(docelem.styles)
 'print("Hello, World!")'
-'python'
+['python']
 
 ----
 
 
 The functions return an iterators for the objects-elements of the document.  They store the following attributes:
 
-* data: The data associated with the element. Usually text, but in the case of tables, you can get either a matrix or a dictionary (see the example at the end of the readme) and in the case of lists, you can get only dictionary.
-* section: The section of the document the element belongs to
-* style: The style of the object (if element is source, paragraph, admonition block or text_line)
+* data: The data associated with the element. Usually text, but in the case of tables, you can get a dictionary (see the example at the end of the readme).
+* section: List of sections of the document the element belongs to
+* style: List of styles of the object
 
 List of styles:
 
@@ -117,13 +113,51 @@ List of styles:
 ** caution
 ** warning
 * for all elements area style
-** sidebar
-** example
-** quote
-** listning
-** literal
+** sidebarblock
+** exampleblock
+** quoteblock
+** listningblock
+** literalblock
 
-You can set a named *style* and *section* parameters for these methods for a more accurate selection.
+You can get the text from the paragraph object only through the *get_text()* method. It has a url_opt parameter.
+
+url_opt can be:
+
+* 'show_links'
+* 'hide_links'
+
+This option can hide the url of a link ,hyperlink, media src(image, audio, video) or show it. The default is 'hide_links'
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+You can also use https://www.macports.org[MacPorts], another package manager for macOS, to install Asciidoctor.
+
+If you dont have MacPorts on your computer, complete the https://www.macports.org/install.php[installation instructions] first.
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open(test.adoc)
+... parser = Parser(my_file)
+
+>>> for docelem in parser.paragraphs():
+...     print(docelem.get_text())
+'You can also use MacPorts, another package manager for macOS, to install Asciidoctor.'
+'If you dont have MacPorts on your computer, complete the installation instructions first.'
+>>> for docelem in parser.paragraphs():
+...     print(docelem.get_text('show_urls'))
+'You can also use https://www.macports.org[MacPorts], another package manager for macOS, to install Asciidoctor.'
+'If you dont have MacPorts on your computer, complete the https://www.macports.org/install.php[installation instructions] first.'
+
+'print("Hello, World!")'
+----
+
+You can set a named *style* and *section* parameters for Parser methods for a more accurate selection.
 
 [source,asciidoc]
 .test.adoc
@@ -148,17 +182,28 @@ std::cout << "Hello, World!";
 ... my_file = open(test.adoc)
 ... parser = Parser(my_file)
 
->>> for docelem in parser.sources(style='cpp'):
+>>> for docelem in parser.sources(['cpp']):
 ...     print(docelem.data)
 ...     print(docelem.style)
 'std::cout << "Hello, World!";'
-'cpp'
->>> for docelem in parser.sources(section='Document Title->Python'):
+['cpp']
+>>> for docelem in parser.sources([], ['Python']):
 ...     print(docelem.data)
 
 'print("Hello, World!")'
 ----
+Styles and sections are filtered by passing lists. They store the necessary styles or sections. The selection takes place for objects whose style and section attributes have elements of the passed lists as a subset.
 
+If you pass the list of sections ['C++', 'Python'] in the example above, nothing will be output, because there is no code object that is both in the C++ section and in the Python section.
+
+[CAUTION]
+====
+Features of working with the parser:
+
+* The level 0 section can only be 1
+* Only the text is extracted from the tables and lists
+* Nested tables cannot be used
+====
 === How get tables:
 
 [source,asciidoc]
@@ -181,8 +226,7 @@ std::cout << "Hello, World!";
 
 ----
 
-
-The table objects also have the *data.marix* and *data.dict* attributes.
+The table objects also have the *data* attribute which stores the dictionary
 
 [source, python]
 ----
@@ -192,22 +236,14 @@ The table objects also have the *data.marix* and *data.dict* attributes.
 >>> elemiter = parser.table()
 >>> elemiter = next(elemiter)
 
->>>  print(elemiter.data.matrix[0][0])
-'Cell in column 1, row 1'
->>> print(elemiter.data.matrix[1][0])
-'Cell in column 2, row 1'
-
-----
-
-
-[source, python]
-----
-
->>> print(elemiter.data.dict["col1"])
-['Cell in column 1, row 1', 'Cell in column 1, row 2', 'Cell in column 1, row 3']
+>>>  print(elemiter.data)
+{'col1':['Cell in column 1, row 1', 'Cell in column 1, row 2', 'Cell in column 1, row 3'], 'col2':['Cell in column 2, row 1', 'Cell in column 2, row 2', 'Cell in column 2, row 3']}
 
 ----
 Keys with the names "col1" and "col2" were automatically created
+
+Using the *to_dict()* and *to_matrix()* methods, you can change the data attribute to a dictionary or matrix, respectively
+
 [source,asciidoc]
 .test1.adoc
 ----
@@ -234,14 +270,15 @@ Keys with the names "col1" and "col2" were automatically created
 >>> elemiter = parser.tables()
 >>> elemiter = next(elemiter)
 
->>>  print(elemiter.data.dict["Column 1"])
+>>>  print(elemiter.data["Column 1"])
 ["Cell in column 1"]
->>> print(elemiter.data.matrix[0][0])
+>>> elemiter.to_matrix()
+>>> print(elemiter.data[0][0])
 'Column 1'
->>> print(elemiter.data.matrix[0][1])
+>>> print(elemiter.data[0][1])
 'Cell in column 1'
 ----
-The first element in the column becomes the column name
+The first element in the column becomes the column name (in matrix)
 
 === get_near_up() and get_near_down() methods
 

@@ -1,3 +1,5 @@
+import os
+
 import lxml.html
 
 from adparser.Parser import Parser
@@ -7,7 +9,11 @@ from lxml import html, etree
 
 
 
-with open("C:/Users/fertc/PycharmProjects/AsciiDocParse/tests/test.html") as my_file:
-    parser = Parser(my_file, link_opt='show_url')
+with open("C:/Users/fertc/PycharmProjects/AsciiDocParse/tests/test1.html") as my_file:
+    parser = Parser(my_file)
+
+    for p in parser.headings():
+        print(p.data)
+
 
 

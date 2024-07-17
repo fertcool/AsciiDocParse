@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 
 class Block(abc.ABC):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style):
         if not section:
@@ -20,16 +19,14 @@ class Block(abc.ABC):
         self.data = data
         self._parent = parent
 
-
-
-        self.children: list = []  # list of children blocks
+        self._children: list = []  # list of children blocks
 
     def add_style(self, style):
         if style:
             self.styles.append(style)
 
     @abc.abstractmethod
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor):
         pass
 
     def get_near_up(self, element: str, style=None):
@@ -43,140 +40,167 @@ class Block(abc.ABC):
 
 
 class RootBlock(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, section=None):
         super().__init__(None, section, None, None)
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor):
         pass
 
 
 class DelimeterBlock(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, section, parent, style):
         super().__init__(None, section, parent, style)
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor):
         pass
 
 
 class TextLine(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style=None):
         super().__init__(data, section, parent, style)
 
-    def accept(self, visitor: Visitor):
-        pass
+    def accept(self, visitor):
+        visitor.visit_text_line(self)
 
 
 class Link(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style, attribute):
         super().__init__(data, section, parent, style)
         self.attribute = attribute
 
-    def accept(self, visitor: Visitor):
-        pass
+    def accept(self, visitor):
+        visitor.visit_link(self)
 
 
 class Paragraph(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style=None):
         super().__init__(data, section, parent, style)
 
-    def accept(self, visitor: Visitor):
-        pass
+    def accept(self, visitor):
+        visitor.visit_paragraph(self)
+
+    def get_text(self, url_opt="hide_urls"):
+        full_str = ''
+        for i in range(len(self._children)):
+            if url_opt == 'hide_urls':
+                if isinstance(self._children[i], Link):
+                    full_str += f"{self._children[i].attribute}"
+                elif isinstance(self._children[i], Image):
+                    full_str += "image[]"
+                elif isinstance(self._children[i], Video):
+                    full_str += "video[]"
+                elif isinstance(self._children[i], Audio):
+                    full_str += "audio[]"
+                else:
+                    full_str += str(self._children[i].data)
+            elif url_opt == 'show_urls':
+                if isinstance(self._children[i], Link):
+                    full_str += f"{self._children[i].data}[{self._children[i].attribute}]"
+                elif isinstance(self._children[i], Image):
+                    full_str += f"image[{self._children[i].data}]"
+                elif isinstance(self._children[i], Video):
+                    full_str += f"video[{self._children[i].data}]"
+                elif isinstance(self._children[i], Audio):
+                    full_str += f"audio[{self._children[i].data}]"
+                else:
+                    full_str += str(self._children[i].data)
+            else:
+                print("Incorrect url_opt!")
+                break
+
+        return full_str
 
 
 class Section(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, section, parent):
         super().__init__(None, section, parent, None)
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor):
         pass
 
 
 class Heading(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style=None):
         super().__init__(data, section, parent, style)
 
-    def accept(self, visitor: Visitor):
-        pass
+    def accept(self, visitor):
+        visitor.visit_heading(self)
 
 
 class List(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style):
         super().__init__(data, section, parent, style)
 
-    def accept(self, visitor: Visitor):
-        pass
+    def accept(self, visitor):
+        visitor.visit_list(self)
 
 
 class SourceBlock(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style):
         super().__init__(data, section, parent, style)
         self.style = style
 
-    def accept(self, visitor: Visitor):
-        pass
-
-
-@dataclass
-class MatDict:
-    matrix: list
-    dict: dict
+    def accept(self, visitor):
+        visitor.visit_source(self)
 
 
 class Table(Block):
-    from src.adparser.Visitors import Visitor
 
-    def __init__(self, matrix, diction, section, parent, style=None):
-        super().__init__(None, section, parent, style)
-        self.data = MatDict(matrix, diction)
+    def __init__(self, diction, section, parent, style=None):
+        super().__init__(diction, section, parent, style)
 
-    def accept(self, visitor: Visitor):
-        pass
+    def to_array(self):
+        if not isinstance(self.data, list):
+            self.data = [[key] + [value for value in self.data[key]] for key in self.data.keys()]
+
+    def to_dict(self):
+        if not isinstance(self.data, dict):
+            self.data = {col[0]: col[1:] for col in self.data}
+
+    def accept(self, visitor):
+        visitor.visit_table(self)
 
 
 class Admonition(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, section, parent, style):
         super().__init__(None, section, parent, style)
 
-    def accept(self, visitor: Visitor):
+    def accept(self, visitor):
         pass
 
 
 class Audio(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style):
         super().__init__(data, section, parent, style)
 
-    def accept(self, visitor: Visitor):
-        pass
+    def accept(self, visitor):
+        visitor.visit_audio(self)
 
 
 class Image(Block):
-    from src.adparser.Visitors import Visitor
 
     def __init__(self, data, section, parent, style):
         super().__init__(data, section, parent, style)
 
-    def accept(self, visitor: Visitor):
-        pass
+    def accept(self, visitor):
+        visitor.visit_image(self)
 
+
+class Video(Block):
+
+    def __init__(self, data, section, parent, style):
+        super().__init__(data, section, parent, style)
+
+    def accept(self, visitor):
+        visitor.visit_video(self)
