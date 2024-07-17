@@ -1,3 +1,6 @@
+import os
+import shutil
+import subprocess
 
 from src.adparser.AST.Blocks.BlockIterator import BlockIterator
 from src.adparser.AST.Scaners.HTMLScaner import HTMLScaner
@@ -8,7 +11,7 @@ def print_tree(node, level=0):
     indent = "    " * level
     print(f"{indent}{node.__class__.__name__}  {node.section}  {node.styles}")
 
-    for child in node.children:
+    for child in node._children:
         print_tree(child, level + 1)
 
 
@@ -18,15 +21,31 @@ class Parser:
 
         # discriptor or str
         if hasattr(file, 'read'):
-            self.content = file.read()
+            path = file.name
         else:
-            self.content = file
+            path = file
+
+        if shutil.which("asciidoctor") is None:
+            print("asciidoctor not found in PATH")
+            exit(1)
+
+        subprocess.run(['asciidoctor', path], shell=True)
+
+        # forming the path to the html file that was automatically created by asciidoctor
+        dir_path, file_ext = os.path.split(path)
+        file_name, ext = os.path.splitext(os.path.basename(path))
+        new_path = os.path.join(dir_path, f"{file_name}.html")
+
+        # read html
+        with open(new_path) as htmlfile:
+            self.htmlcontent = htmlfile.read()
+
+        # delete html file
+        os.remove(new_path)
 
         scaner = HTMLScaner()
-        self.astree = scaner.build_AST(self.content)
-        pass
+        self.astree = scaner.build_AST(self.htmlcontent)
         # print_tree(self.astree)
-
 
     """the functions create a visitor, dfs with this visitor returns an iterator to the blocks"""
 
