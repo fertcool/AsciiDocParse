@@ -100,7 +100,7 @@ class Parser:
         return BlockIterator(visitor.select_list)
 
 
-    def audios(self, style, section=None) -> BlockIterator:
+    def audios(self, style=None, section=None) -> BlockIterator:
         if style is None:
             style = []
         if section is None:
@@ -110,7 +110,7 @@ class Parser:
         self.astree.dfs(visitor)
         return BlockIterator(visitor.select_list)
 
-    def images(self, style, section=None) -> BlockIterator:
+    def images(self, style=None, section=None) -> BlockIterator:
         if style is None:
             style = []
         if section is None:
@@ -120,7 +120,7 @@ class Parser:
         self.astree.dfs(visitor)
         return BlockIterator(visitor.select_list)
 
-    def videos(self, style, section=None) -> BlockIterator:
+    def videos(self, style=None, section=None) -> BlockIterator:
         if style is None:
             style = []
         if section is None:
