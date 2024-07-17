@@ -75,7 +75,7 @@ class Parser:
         if section is None:
             section = []
 
-        visitor = LinkSelector(section, style)
+        visitor = ListSelector(section, style)
         self.astree.dfs(visitor)
         return BlockIterator(visitor.select_list)
 
