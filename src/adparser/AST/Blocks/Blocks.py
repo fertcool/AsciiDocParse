@@ -29,8 +29,67 @@ class Block(abc.ABC):
     def accept(self, visitor):
         pass
 
+    def __type_check(self, elstr, elem, searchstyle):
+        if elstr == 'text_line' and isinstance(elem, TextLine) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'link' and isinstance(elem, Link) \
+                and set(searchstyle).issubset(set(elem.styles))  \
+        or elstr == 'paragraph' and isinstance(elem, Paragraph) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'heading' and isinstance(elem, Heading) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'list' and isinstance(elem, List) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'source_block' and isinstance(elem, SourceBlock) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'table' and isinstance(elem, Table) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'audio' and isinstance(elem, Audio) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'video' and isinstance(elem, Video) \
+                and set(searchstyle).issubset(set(elem.styles)) \
+        or elstr == 'image' and isinstance(elem, Image) \
+                and set(searchstyle).issubset(set(elem.styles)):
+            return True
+        return False
+
     def get_near_up(self, element: str, style=None):
-        pass
+
+        if style is None:
+            style = []
+
+        curparent = self._parent
+        rev_cildren = list(reversed(curparent._children))
+        for i in range(len(rev_cildren)):
+            if rev_cildren[i] is self:
+                rev_cildren = rev_cildren[i + 1:]
+                break
+
+        stop = False
+        while not stop:
+            if isinstance(curparent, RootBlock):
+                stop = True
+            for elem in rev_cildren:
+                stack = [elem]
+                while stack:
+                    inelem = stack.pop()
+
+                    if self.__type_check(element, inelem, style):
+                        return inelem
+
+                    for inel in inelem._children:
+                        stack.append(inel)
+
+            if not stop:
+                oldparent = curparent
+                curparent = curparent._parent
+                rev_cildren = list(reversed(curparent._children))
+                for i in range(len(rev_cildren)):
+                    if rev_cildren[i] is oldparent:
+                        rev_cildren = rev_cildren[i + 1:]
+                        break
+
+        return None
 
     def get_near_down(self, element: str, style=None):
         pass
@@ -147,7 +206,7 @@ class SourceBlock(Block):
 
     def __init__(self, data, section, parent, style):
         super().__init__(data, section, parent, style)
-        self.style = style
+
 
     def accept(self, visitor):
         visitor.visit_source(self)
