@@ -10,14 +10,14 @@ pip install adparser
 == Extracting Document Elements
 The asciidoc library can extract the following elements from an AsciiDoc document:
 
-* text lines (text_line) - the paragraph element are made up of it
-* link (links)
-* paragraphs (paragraph)
-* headings (heading)
-* lists (list)
-* source blocks (source)
-* tables (table)
-* audio, video, and images. (audio, video, image)
+* text lines - the paragraph element are made up of it
+* link
+* paragraphs
+* headings
+* lists
+* source blocks
+* tables
+* audio, video, and images.
 
 To access these elements, you can use the Parser object.
 
@@ -83,7 +83,7 @@ image::image.png[]
 ...     print(docelem.data)
 'Document Title'
 'Section 1'
->>> for docelem in parser.sources():
+>>> for docelem in parser.source_blocks():
 ...     print(docelem.data)
 ...     print(docelem.styles)
 'print("Hello, World!")'
@@ -96,7 +96,7 @@ The functions return an iterators for the objects-elements of the document.  The
 
 * data: The data associated with the element. Usually text, but in the case of tables, you can get a dictionary (see the example at the end of the readme).
 * section: List of sections of the document the element belongs to
-* style: List of styles of the object
+* styles: List of styles of the object
 
 List of styles:
 
@@ -123,10 +123,10 @@ You can get the text from the paragraph object only through the *get_text()* met
 
 url_opt can be:
 
-* 'show_links'
-* 'hide_links'
+* 'show_urls'
+* 'hide_urls'
 
-This option can hide the url of a link ,hyperlink, media src(image, audio, video) or show it. The default is 'hide_links'
+This option can hide the url of a link ,hyperlink, media src(image, audio, video) or show it. The default is 'hide_urls'
 
 [source,asciidoc]
 .test.adoc
@@ -182,12 +182,12 @@ std::cout << "Hello, World!";
 ... my_file = open(test.adoc)
 ... parser = Parser(my_file)
 
->>> for docelem in parser.sources(['cpp']):
+>>> for docelem in parser.source_blocks(['cpp']):
 ...     print(docelem.data)
 ...     print(docelem.style)
 'std::cout << "Hello, World!";'
 ['cpp']
->>> for docelem in parser.sources([], ['Python']):
+>>> for docelem in parser.source_blocks([], ['Python']):
 ...     print(docelem.data)
 
 'print("Hello, World!")'
@@ -280,9 +280,9 @@ Using the *to_dict()* and *to_matrix()* methods, you can change the data attribu
 ----
 The first element in the column becomes the column name (in matrix)
 
-=== get_near_up() and get_near_down() methods
+=== get_near() method
 
-To access the closest element to the current one, there are methods get_near_up() and get_near_down(). The accepted parameter is a string with the name of the required element.
+To access the closest element to the current one, there is method get_near. The accepted parameters are a string with the name of the required element and a string with the direction: 'up' or 'down'.
 
 [source,asciidoc]
 .test.adoc
@@ -310,15 +310,15 @@ image::image.png[]
 >>> from adparser import Parser
 ... my_file = open(test.adoc)
 ... parser = Parser(my_file)
->>> for docelem in parser.source():
-...     up_heading = docelem.get_near_up("heading")
+>>> for docelem in parser.source_blocks():
+...     up_heading = docelem.get_near("heading", direction='up')
 ...     print(up_heading.data)
-...     down_image = docelem.get_near_down("image")
+...     down_image = docelem.get_near("image", direction='down')
 ...     print(down_image.data)
-'Document Title -> Section 1'
+'Section 1'
 'image.png'
 ----
-In the case of directly nested elements, get_near_up() will output the lowest element from the upper level, and get_near_down() will output the farthest from the inner one.
+
 
 [source,asciidoc]
 .test2.adoc
@@ -340,13 +340,12 @@ The document header is useful, but not required.
 [source, python]
 ----
 >>> from adparser import Parser
-... my_file = open(test.adoc)
+... my_file = open(test2.adoc)
 ... parser = Parser(my_file)
->>> for docelem in parser.paragraphs(style='listing'):
-...     up_heading = docelem.get_near_up("paragraph")
-...     print(up_heading.data)
+>>> for docelem in parser.paragraphs(style=['listingblock']):
+...     up_heading = docelem.get_near("paragraph", direction='up')
+...     print(up_heading.get_text())
 
-'The document header is useful, but not required.'
-'= Document Title'
+'Here’s a sample AsciiDoc document:'
 ----
 You can also set a named style parameter for these methods.

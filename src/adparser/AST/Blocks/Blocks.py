@@ -53,13 +53,20 @@ class Block(abc.ABC):
             return True
         return False
 
-    def get_near_up(self, element: str, style=None):
+    def get_near(self, element: str, style=None, direction='up'):
 
         if style is None:
             style = []
 
         curparent = self._parent
-        rev_cildren = list(reversed(curparent._children))
+        if direction == 'up':
+            rev_cildren = list(reversed(curparent._children))
+        elif direction =='down':
+            rev_cildren = curparent._children
+        else:
+            print('Incorrect direction')
+            return
+
         for i in range(len(rev_cildren)):
             if rev_cildren[i] is self:
                 rev_cildren = rev_cildren[i + 1:]
@@ -83,7 +90,12 @@ class Block(abc.ABC):
             if not stop:
                 oldparent = curparent
                 curparent = curparent._parent
-                rev_cildren = list(reversed(curparent._children))
+
+                if direction == 'up':
+                    rev_cildren = list(reversed(curparent._children))
+                elif direction == 'down':
+                    rev_cildren = curparent._children
+
                 for i in range(len(rev_cildren)):
                     if rev_cildren[i] is oldparent:
                         rev_cildren = rev_cildren[i + 1:]
@@ -91,8 +103,6 @@ class Block(abc.ABC):
 
         return None
 
-    def get_near_down(self, element: str, style=None):
-        pass
 
 
 """blocks classes description"""
