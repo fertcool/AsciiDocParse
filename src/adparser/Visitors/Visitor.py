@@ -1,7 +1,7 @@
 # base Visitor class
 # each implementation processes each node of the AST in its own way
 # Visitor gives desired result of parsing the AsciiDoc document
-from src.adparser.AST.Blocks.Blocks import *
+from adparser.AST.Blocks import *
 
 
 class Visitor:

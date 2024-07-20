@@ -1,3 +1,3 @@
-import src.adparser.AST.Blocks
-import src.adparser.AST.Scaners
-import src.adparser.AST.ASTree
+# We can access ASTree from this package
+
+from adparser.AST.ASTree import ASTree

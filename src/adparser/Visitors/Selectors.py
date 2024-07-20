@@ -1,4 +1,4 @@
-from src.adparser.Visitors.Visitor import *
+from adparser.Visitors.Visitor import *
 
 
 class Selector(Visitor):

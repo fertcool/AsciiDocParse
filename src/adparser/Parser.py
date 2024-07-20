@@ -1,10 +1,13 @@
+# The class of the Parser object that the user interacts with directly.
+# It has methods that return iterators for the selected type of asciidoc document objects
+
 import os
 import shutil
 import subprocess
 
-from src.adparser.AST.Blocks.BlockIterator import BlockIterator
-from src.adparser.AST.Scaners.HTMLScaner import HTMLScaner
-from src.adparser.Visitors.Selectors import *
+from adparser.AST.Blocks import BlockIterator
+from adparser.AST.Scaners import HTMLScaner
+from adparser.Visitors import *
 
 
 def print_tree(node, level=0):

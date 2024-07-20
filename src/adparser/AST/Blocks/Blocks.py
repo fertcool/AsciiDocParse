@@ -1,7 +1,5 @@
 # base block class for AST
 import abc
-from dataclasses import dataclass
-
 
 class Block(abc.ABC):
 

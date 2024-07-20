@@ -1,4 +1,6 @@
-from src.adparser.AST.Blocks.Blocks import Block
+# iterator over the blocks of the tree
+
+from adparser.AST.Blocks import Block
 
 
 class BlockIterator:

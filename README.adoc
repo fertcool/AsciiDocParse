@@ -7,6 +7,9 @@ Install the asciidoc library using pip:
 [source,bash]
 pip install adparser
 
+It is also necessary that *asciidoctor* is preinstalled in the system. You can find out how to do this by following the link https://asciidoctor.org/#installation . Before using the library, make sure that the asciidoctor path is in the _PATH_.
+
+
 == Extracting Document Elements
 The asciidoc library can extract the following elements from an AsciiDoc document:
 

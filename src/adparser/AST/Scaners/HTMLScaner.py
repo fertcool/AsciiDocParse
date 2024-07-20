@@ -1,10 +1,10 @@
+# Implementation of a scaner that builds an asciidoc tree of a document based on its html version
+
 from lxml import html
 
-from src.adparser.AST.Blocks.Blocks import RootBlock
-from src.adparser.AST.Scaners.Scaner import Scaner
-from src.adparser.AST.Blocks.Blocks import *
-
-from src.adparser.AST.ASTree import ASTree
+from adparser.AST.Scaners.Scaner import Scaner
+from adparser.AST.Blocks.Blocks import *
+from adparser.AST.ASTree import ASTree
 
 
 class HTMLScaner(Scaner):
