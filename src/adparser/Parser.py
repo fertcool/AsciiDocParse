@@ -29,7 +29,7 @@ class Parser:
             print("asciidoctor not found in PATH")
             exit(1)
 
-        subprocess.run(['asciidoctor', path], shell=True)
+        subprocess.run('asciidoctor ' + path, shell=True)
 
         # forming the path to the html file that was automatically created by asciidoctor
         dir_path, file_ext = os.path.split(path)
