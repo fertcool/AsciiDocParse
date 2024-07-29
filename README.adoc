@@ -100,6 +100,7 @@ The functions return an iterators for the objects-elements of the document.  The
 * data: The data associated with the element. Usually text, but in the case of tables, you can get a dictionary (see the example at the end of the readme).
 * section: List of sections of the document the element belongs to
 * styles: List of styles of the object
+* attribute (*only for links*): text of the link
 
 List of styles:
 
