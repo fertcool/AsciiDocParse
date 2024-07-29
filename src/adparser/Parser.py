@@ -54,103 +54,42 @@ class Parser:
 
     """the functions create a visitor, dfs with this visitor returns an iterator to the blocks"""
 
-    def text_lines(self, style=None, section=None) -> BlockIterator:
+    def _select_parse(self, style, section, selectorclass):
         if style is None:
             style = []
         if section is None:
             section = []
-        visitor = TextLineSelector(section, style)
+        visitor = selectorclass(section, style)
         self.astree.dfs(visitor)
         return BlockIterator(visitor.select_list)
 
+    def text_lines(self, style=None, section=None) -> BlockIterator:
+        return self._select_parse(style, section, TextLineSelector)
 
     def links(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = LinkSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, LinkSelector)
 
     def paragraphs(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-        visitor = ParagraphSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, ParagraphSelector)
 
     def headings(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = HeadingSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, HeadingSelector)
 
     def lists(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = ListSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, ListSelector)
 
     def source_blocks(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = SourceSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, SourceSelector)
 
     def tables(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = TableSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
-
+        return self._select_parse(style, section, TableSelector)
 
     def audios(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = AudioSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, AudioSelector)
 
     def images(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = ImageSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, ImageSelector)
 
     def videos(self, style=None, section=None) -> BlockIterator:
-        if style is None:
-            style = []
-        if section is None:
-            section = []
-
-        visitor = VideoSelector(section, style)
-        self.astree.dfs(visitor)
-        return BlockIterator(visitor.select_list)
+        return self._select_parse(style, section, VideoSelector)
 
