@@ -4,6 +4,7 @@
 import os
 import shutil
 import subprocess
+import tempfile
 
 from adparser.AST.Blocks import BlockIterator
 from adparser.AST.Scaners import HTMLScaner
@@ -32,12 +33,13 @@ class Parser:
             print("asciidoctor not found in PATH")
             exit(1)
 
-        subprocess.run('asciidoctor ' + path, shell=True)
+        # using OS temp dir
+        temp_dir = tempfile.gettempdir()
+        subprocess.run('asciidoctor ' + path + ' -D ' + temp_dir, shell=True)
 
         # forming the path to the html file that was automatically created by asciidoctor
-        dir_path, file_ext = os.path.split(path)
-        file_name, ext = os.path.splitext(os.path.basename(path))
-        new_path = os.path.join(dir_path, f"{file_name}.html")
+        file_name = os.path.splitext(os.path.basename(path))[0]
+        new_path = os.path.join(temp_dir, f"{file_name}.html")
 
         # read html
         with open(new_path) as htmlfile:
