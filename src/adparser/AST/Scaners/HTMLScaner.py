@@ -128,6 +128,10 @@ class HTMLScaner(Scaner):
 
         # in the style of a quote, we add the author to the styles attribute
         elif new_ad_parent.styles[-1] == "quoteblock":
+            ASTree.add_sub_element(new_ad_parent,
+                                   self.__create_paragraph(html_node.xpath(".//*[@class='paragraph']")[0],
+                                                           new_ad_parent, [False])
+                                   )
             new_ad_parent.styles.append(html_node.xpath(".//*[@class='attribution']")[0].text_content())
             go_down_flag[0] = False
 
