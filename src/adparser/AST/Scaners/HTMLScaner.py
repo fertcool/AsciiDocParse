@@ -224,35 +224,41 @@ class HTMLScaner(Scaner):
         old_styles = old_ad_parent.styles.copy()
 
         if isinstance(html_node, str):
+            html_node = html_node.lstrip('\n')
+            html_node = html_node.rstrip('\n')
             return TextLine(html_node,
                         old_ad_parent.section,
                         old_ad_parent,
                         old_ad_parent.styles,
                         )
+        html_text = html_node.text
+        html_text = html_text.lstrip('\n')
+        html_text = html_text.rstrip('\n')
+
         # styled text
-        elif html_node.tag == 'b' or html_node.tag == 'strong':
+        if html_node.tag == 'b' or html_node.tag == 'strong':
             old_styles.append('bold')
-            return TextLine(html_node.text,
+            return TextLine(html_text,
                             old_ad_parent.section,
                             old_ad_parent,
                             old_styles,
                             )
         elif html_node.tag == 'em' or html_node.tag == 'i':
             old_styles.append('italic')
-            return TextLine(html_node.text,
+            return TextLine(html_text,
                             old_ad_parent.section,
                             old_ad_parent,
                             old_styles,
                             )
         elif html_node.tag == 'code':
             old_styles.append('monospace')
-            return TextLine(html_node.text,
+            return TextLine(html_text,
                             old_ad_parent.section,
                             old_ad_parent,
                             old_styles,
                             )
 
-        return TextLine(html_node.text,
+        return TextLine(html_text,
                         old_ad_parent.section,
                         old_ad_parent,
                         old_ad_parent.styles,
