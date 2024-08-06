@@ -313,8 +313,7 @@ class HTMLScaner(Scaner):
         elif html_node.get("class") in ['admonitionblock caution', 'admonitionblock note', 'admonitionblock tip',
                                         'admonitionblock important',
                                         'admonitionblock warning']:
-            if html_node.get('class') == 'admonitionblock warning':
-                pass
+
             new_ad_parent = self.__create_admonition(html_node, old_ad_parent, go_down_flag)
 
         # ---- 3 - the delimeter element? Also create source-------
@@ -361,8 +360,8 @@ class HTMLScaner(Scaner):
                                                             "tag"):
             new_ad_parent = self.__create_paragraph(html_node, old_ad_parent, go_down_flag)
 
-        # other with text
-        elif not len(html_node) and html_node.text:
+        # other with text (also not title - like in admonition)
+        elif not len(html_node) and html_node.text and html_node.get("class") not in ['title']:
             new_ad_parent = self.__create_paragraph(html_node, old_ad_parent, go_down_flag)
 
         return new_ad_parent
