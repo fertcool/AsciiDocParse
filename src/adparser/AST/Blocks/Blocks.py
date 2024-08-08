@@ -159,10 +159,6 @@ class Paragraph(Block):
                     full_str += f"{self._children[i].attribute}"
                 elif isinstance(self._children[i], Image):
                     full_str += "image[]"
-                elif isinstance(self._children[i], Video):
-                    full_str += "video[]"
-                elif isinstance(self._children[i], Audio):
-                    full_str += "audio[]"
                 else:
                     full_str += str(self._children[i].data)
             elif url_opt == 'show_urls':
@@ -170,10 +166,6 @@ class Paragraph(Block):
                     full_str += f"{self._children[i].data}[{self._children[i].attribute}]"
                 elif isinstance(self._children[i], Image):
                     full_str += f"image[{self._children[i].data}]"
-                elif isinstance(self._children[i], Video):
-                    full_str += f"video[{self._children[i].data}]"
-                elif isinstance(self._children[i], Audio):
-                    full_str += f"audio[{self._children[i].data}]"
                 else:
                     full_str += str(self._children[i].data)
             else:
