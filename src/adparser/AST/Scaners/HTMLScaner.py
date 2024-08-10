@@ -155,7 +155,7 @@ class HTMLScaner(Scaner):
 
         else:
             body = html_node.find("tbody")
-            table_dict = {'col' + str(i): [] for i in range(1, len(body.findall(".//tr")))}
+            table_dict = {'col' + str(i): [] for i in range(1, len(body.find(".//tr").findall(".//td")) + 1)}
             for tr in body.findall(".//tr"):
                 for dcolkey, td in zip(table_dict.keys(), tr.findall(".//td")):
                     table_dict[dcolkey].append(td.text_content())
