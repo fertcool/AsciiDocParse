@@ -400,4 +400,8 @@ class HTMLScaner(Scaner):
             if not child_counter:
                 self.__pop_style()
 
+        # remove paragraph with metadata of html
+        if len(self.adtree._children) > 1:
+            self.adtree._children = self.adtree._children[:-1]
+
         return ASTree(self.adtree)
