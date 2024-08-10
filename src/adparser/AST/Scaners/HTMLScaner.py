@@ -287,14 +287,6 @@ class HTMLScaner(Scaner):
                 ASTree.add_sub_element(new_ad_parent,
                                        self.__create_image(pelem.find("./*"), new_ad_parent,  [False])
                                        )
-            elif pelem.get("class") in ['audio']:
-                ASTree.add_sub_element(new_ad_parent,
-                                       self.__create_audio(pelem.find("./*"), new_ad_parent,  [False])
-                                       )
-            elif pelem.get("class") in ['video']:
-                ASTree.add_sub_element(new_ad_parent,
-                                       self.__create_video(pelem.find("./*"), new_ad_parent,  [False])
-                                       )
             else:
                 ASTree.add_sub_element(new_ad_parent,
                                        self.__create_textline(pelem, new_ad_parent,  [False])
