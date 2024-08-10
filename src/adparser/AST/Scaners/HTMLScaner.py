@@ -195,7 +195,7 @@ class HTMLScaner(Scaner):
 
     def __create_audio(self, html_node, old_ad_parent, go_down_flag):
         go_down_flag[0] = False
-        srcnode = html_node.xpath("..//*[@src]")[0]
+        srcnode = html_node.xpath(".//*[@src]")[0]
         return Audio(srcnode.get("src"),
                      old_ad_parent.section,
                      old_ad_parent,
@@ -203,7 +203,7 @@ class HTMLScaner(Scaner):
 
     def __create_video(self, html_node, old_ad_parent, go_down_flag):
         go_down_flag[0] = False
-        srcnode = html_node.xpath("..//*[@src]")[0]
+        srcnode = html_node.xpath(".//*[@src]")[0]
         return Video(srcnode.get("src"),
                      old_ad_parent.section,
                      old_ad_parent,
