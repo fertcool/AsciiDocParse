@@ -81,9 +81,12 @@ class Block(abc.ABC):
 
                     if self.__type_check(element, inelem, style):
                         return inelem
-
-                    for inel in inelem._children:
-                        stack.append(inel)
+                    if direction == 'down':
+                        for inel in reversed(inelem._children):
+                            stack.append(inel)
+                    else:
+                        for inel in inelem._children:
+                            stack.append(inel)
 
             if not stop:
                 oldparent = curparent
