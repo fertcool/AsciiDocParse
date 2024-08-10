@@ -55,6 +55,9 @@ class HTMLScaner(Scaner):
     def __pop_style(self):
         if self.__style_stack and self.__style_stack[-1][1] == 0:
             self.__style_stack.pop()
+            # double pop for nested situations
+            if self.__style_stack and self.__style_stack[-1][1] == 0:
+                self.__style_stack.pop()
 
     def __increase_style(self):
         if self.__style_stack:
@@ -134,8 +137,6 @@ class HTMLScaner(Scaner):
                                    )
             new_ad_parent.styles.append(html_node.xpath(".//*[@class='attribution']")[0].text_content())
             go_down_flag[0] = False
-
-
 
         return new_ad_parent
 
