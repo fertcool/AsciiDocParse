@@ -161,7 +161,7 @@ class Paragraph(Block):
                 if isinstance(self._children[i], Link):
                     full_str += f"{self._children[i].attribute}"
                 elif isinstance(self._children[i], Image):
-                    full_str += "image[]"
+                    full_str += self._children[i].data
                 else:
                     full_str += str(self._children[i].data)
             elif url_opt == 'show_urls':
