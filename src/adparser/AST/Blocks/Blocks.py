@@ -220,7 +220,7 @@ class Table(Block):
     def __init__(self, diction, section, parent, style=None):
         super().__init__(diction, section, parent, style)
 
-    def to_array(self):
+    def to_matrix(self):
         if not isinstance(self.data, list):
             self.data = [[key] + [value for value in self.data[key]] for key in self.data.keys()]
 
