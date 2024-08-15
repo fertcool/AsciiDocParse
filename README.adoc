@@ -254,8 +254,7 @@ Using the *to_dict()* and *to_matrix()* methods, you can change the data attribu
 
 = Document Title
 
-[cols="1,1"]
-[cols="3,3,3,3"]
+[cols="1,1,1,1"]
 |===
 |Column 1 |Column 2 |Column 3 |Column 4
 
