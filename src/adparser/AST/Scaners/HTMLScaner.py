@@ -169,7 +169,10 @@ class HTMLScaner(Scaner):
     def __create_list(self, html_node, old_ad_parent, go_down_flag):
 
         go_down_flag[0] = False
-        return List(html_node.text_content(),
+        html_text = html_node.text_content()
+        html_text = html_text.lstrip('\n')
+        html_text = html_text.rstrip('\n')
+        return List(html_text,
                     old_ad_parent.section,
                     old_ad_parent,
                     old_ad_parent.styles)
