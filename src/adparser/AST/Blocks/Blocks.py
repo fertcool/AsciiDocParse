@@ -81,9 +81,12 @@ class Block(abc.ABC):
 
                     if self.__type_check(element, inelem, style):
                         return inelem
-
-                    for inel in inelem._children:
-                        stack.append(inel)
+                    if direction == 'down':
+                        for inel in reversed(inelem._children):
+                            stack.append(inel)
+                    else:
+                        for inel in inelem._children:
+                            stack.append(inel)
 
             if not stop:
                 oldparent = curparent
@@ -158,11 +161,7 @@ class Paragraph(Block):
                 if isinstance(self._children[i], Link):
                     full_str += f"{self._children[i].attribute}"
                 elif isinstance(self._children[i], Image):
-                    full_str += "image[]"
-                elif isinstance(self._children[i], Video):
-                    full_str += "video[]"
-                elif isinstance(self._children[i], Audio):
-                    full_str += "audio[]"
+                    full_str += self._children[i].data
                 else:
                     full_str += str(self._children[i].data)
             elif url_opt == 'show_urls':
@@ -170,10 +169,6 @@ class Paragraph(Block):
                     full_str += f"{self._children[i].data}[{self._children[i].attribute}]"
                 elif isinstance(self._children[i], Image):
                     full_str += f"image[{self._children[i].data}]"
-                elif isinstance(self._children[i], Video):
-                    full_str += f"video[{self._children[i].data}]"
-                elif isinstance(self._children[i], Audio):
-                    full_str += f"audio[{self._children[i].data}]"
                 else:
                     full_str += str(self._children[i].data)
             else:
@@ -225,7 +220,7 @@ class Table(Block):
     def __init__(self, diction, section, parent, style=None):
         super().__init__(diction, section, parent, style)
 
-    def to_array(self):
+    def to_matrix(self):
         if not isinstance(self.data, list):
             self.data = [[key] + [value for value in self.data[key]] for key in self.data.keys()]
 

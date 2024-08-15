@@ -55,6 +55,9 @@ class HTMLScaner(Scaner):
     def __pop_style(self):
         if self.__style_stack and self.__style_stack[-1][1] == 0:
             self.__style_stack.pop()
+            # double pop for nested situations
+            if self.__style_stack and self.__style_stack[-1][1] == 0:
+                self.__style_stack.pop()
 
     def __increase_style(self):
         if self.__style_stack:
@@ -128,10 +131,12 @@ class HTMLScaner(Scaner):
 
         # in the style of a quote, we add the author to the styles attribute
         elif new_ad_parent.styles[-1] == "quoteblock":
+            ASTree.add_sub_element(new_ad_parent,
+                                   self.__create_paragraph(html_node.xpath(".//*[@class='paragraph'] | .//blockquote")[-1],
+                                                           new_ad_parent, [False])
+                                   )
             new_ad_parent.styles.append(html_node.xpath(".//*[@class='attribution']")[0].text_content())
             go_down_flag[0] = False
-
-
 
         return new_ad_parent
 
@@ -150,7 +155,7 @@ class HTMLScaner(Scaner):
 
         else:
             body = html_node.find("tbody")
-            table_dict = {'col' + str(i): [] for i in range(1, len(body.findall(".//tr")))}
+            table_dict = {'col' + str(i): [] for i in range(1, len(body.find(".//tr").findall(".//td")) + 1)}
             for tr in body.findall(".//tr"):
                 for dcolkey, td in zip(table_dict.keys(), tr.findall(".//td")):
                     table_dict[dcolkey].append(td.text_content())
@@ -164,7 +169,10 @@ class HTMLScaner(Scaner):
     def __create_list(self, html_node, old_ad_parent, go_down_flag):
 
         go_down_flag[0] = False
-        return List(html_node.text_content(),
+        html_text = html_node.text_content()
+        html_text = html_text.lstrip('\n')
+        html_text = html_text.rstrip('\n')
+        return List(html_text,
                     old_ad_parent.section,
                     old_ad_parent,
                     old_ad_parent.styles)
@@ -190,7 +198,7 @@ class HTMLScaner(Scaner):
 
     def __create_audio(self, html_node, old_ad_parent, go_down_flag):
         go_down_flag[0] = False
-        srcnode = html_node.xpath("..//*[@src]")[0]
+        srcnode = html_node.xpath(".//*[@src]")[0]
         return Audio(srcnode.get("src"),
                      old_ad_parent.section,
                      old_ad_parent,
@@ -198,7 +206,7 @@ class HTMLScaner(Scaner):
 
     def __create_video(self, html_node, old_ad_parent, go_down_flag):
         go_down_flag[0] = False
-        srcnode = html_node.xpath("..//*[@src]")[0]
+        srcnode = html_node.xpath(".//*[@src]")[0]
         return Video(srcnode.get("src"),
                      old_ad_parent.section,
                      old_ad_parent,
@@ -220,35 +228,41 @@ class HTMLScaner(Scaner):
         old_styles = old_ad_parent.styles.copy()
 
         if isinstance(html_node, str):
+            html_node = html_node.lstrip('\n')
+            html_node = html_node.rstrip('\n')
             return TextLine(html_node,
                         old_ad_parent.section,
                         old_ad_parent,
                         old_ad_parent.styles,
                         )
+        html_text = html_node.text
+        html_text = html_text.lstrip('\n')
+        html_text = html_text.rstrip('\n')
+
         # styled text
-        elif html_node.tag == 'b' or html_node.tag == 'strong':
+        if html_node.tag == 'b' or html_node.tag == 'strong':
             old_styles.append('bold')
-            return TextLine(html_node.text,
+            return TextLine(html_text,
                             old_ad_parent.section,
                             old_ad_parent,
                             old_styles,
                             )
         elif html_node.tag == 'em' or html_node.tag == 'i':
             old_styles.append('italic')
-            return TextLine(html_node.text,
+            return TextLine(html_text,
                             old_ad_parent.section,
                             old_ad_parent,
                             old_styles,
                             )
         elif html_node.tag == 'code':
             old_styles.append('monospace')
-            return TextLine(html_node.text,
+            return TextLine(html_text,
                             old_ad_parent.section,
                             old_ad_parent,
                             old_styles,
                             )
 
-        return TextLine(html_node.text,
+        return TextLine(html_text,
                         old_ad_parent.section,
                         old_ad_parent,
                         old_ad_parent.styles,
@@ -277,14 +291,6 @@ class HTMLScaner(Scaner):
                 ASTree.add_sub_element(new_ad_parent,
                                        self.__create_image(pelem.find("./*"), new_ad_parent,  [False])
                                        )
-            elif pelem.get("class") in ['audio']:
-                ASTree.add_sub_element(new_ad_parent,
-                                       self.__create_audio(pelem.find("./*"), new_ad_parent,  [False])
-                                       )
-            elif pelem.get("class") in ['video']:
-                ASTree.add_sub_element(new_ad_parent,
-                                       self.__create_video(pelem.find("./*"), new_ad_parent,  [False])
-                                       )
             else:
                 ASTree.add_sub_element(new_ad_parent,
                                        self.__create_textline(pelem, new_ad_parent,  [False])
@@ -309,8 +315,7 @@ class HTMLScaner(Scaner):
         elif html_node.get("class") in ['admonitionblock caution', 'admonitionblock note', 'admonitionblock tip',
                                         'admonitionblock important',
                                         'admonitionblock warning']:
-            if html_node.get('class') == 'admonitionblock warning':
-                pass
+
             new_ad_parent = self.__create_admonition(html_node, old_ad_parent, go_down_flag)
 
         # ---- 3 - the delimeter element? Also create source-------
@@ -357,8 +362,8 @@ class HTMLScaner(Scaner):
                                                             "tag"):
             new_ad_parent = self.__create_paragraph(html_node, old_ad_parent, go_down_flag)
 
-        # other with text
-        elif not len(html_node) and html_node.text:
+        # other with text (also not title - like in admonition)
+        elif not len(html_node) and html_node.text and html_node.get("class") not in ['title']:
             new_ad_parent = self.__create_paragraph(html_node, old_ad_parent, go_down_flag)
 
         return new_ad_parent
@@ -397,5 +402,9 @@ class HTMLScaner(Scaner):
             # then there are no more elements with the current style, we remove the element from the stack
             if not child_counter:
                 self.__pop_style()
+
+        # remove paragraph with metadata of html
+        if len(self.adtree._children) > 1:
+            self.adtree._children = self.adtree._children[:-1]
 
         return ASTree(self.adtree)
