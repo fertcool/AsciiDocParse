@@ -235,6 +235,12 @@ class HTMLScaner(Scaner):
                         old_ad_parent,
                         old_ad_parent.styles,
                         )
+        if html_node.text is None: # <br>
+            return TextLine('\n',
+                            old_ad_parent.section,
+                            old_ad_parent,
+                            old_ad_parent.styles,
+                            )
         html_text = html_node.text
         html_text = html_text.lstrip('\n')
         html_text = html_text.rstrip('\n')
@@ -291,6 +297,7 @@ class HTMLScaner(Scaner):
                 ASTree.add_sub_element(new_ad_parent,
                                        self.__create_image(pelem.find("./*"), new_ad_parent,  [False])
                                        )
+
             else:
                 ASTree.add_sub_element(new_ad_parent,
                                        self.__create_textline(pelem, new_ad_parent,  [False])

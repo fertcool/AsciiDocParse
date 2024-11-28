@@ -15,6 +15,7 @@ def print_tree(node, level=0):
     indent = "    " * level
     print(f"{indent}{node.__class__.__name__}  {node.section}  {node.styles}")
 
+
     for child in node._children:
         print_tree(child, level + 1)
 
@@ -28,6 +29,8 @@ class Parser:
             path = file.name
         else:
             path = file
+            if not os.path.exists(path):
+                raise FileNotFoundError("adoc file not exist!")
 
         if shutil.which("asciidoctor") is None:
             print("asciidoctor not found in PATH")
@@ -42,7 +45,7 @@ class Parser:
         new_path = os.path.join(temp_dir, f"{file_name}.html")
 
         # read html
-        with open(new_path) as htmlfile:
+        with open(new_path, encoding="utf-8") as htmlfile:
             self._htmlcontent = htmlfile.read()
 
         # delete html file

@@ -28,28 +28,13 @@ class Block(abc.ABC):
         pass
 
     def __type_check(self, elstr, elem, searchstyle):
-        if elstr == 'text_line' and isinstance(elem, TextLine) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'link' and isinstance(elem, Link) \
-                and set(searchstyle).issubset(set(elem.styles))  \
-        or elstr == 'paragraph' and isinstance(elem, Paragraph) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'heading' and isinstance(elem, Heading) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'list' and isinstance(elem, List) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'source_block' and isinstance(elem, SourceBlock) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'table' and isinstance(elem, Table) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'audio' and isinstance(elem, Audio) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'video' and isinstance(elem, Video) \
-                and set(searchstyle).issubset(set(elem.styles)) \
-        or elstr == 'image' and isinstance(elem, Image) \
-                and set(searchstyle).issubset(set(elem.styles)):
-            return True
+        str_type_dict = {'text_line':TextLine, 'link': Link, 'paragraph': Paragraph, 'heading': Heading, 'list': List,
+                         'source_block':SourceBlock, 'table': Table,  'audio': Audio, 'video': Video, 'image': Image}
+        if elstr in str_type_dict:
+            if isinstance(elem, str_type_dict[elstr]) and set(searchstyle).issubset(set(elem.styles)):
+                return True
         return False
+
 
     def get_near(self, element: str, style=None, direction='up'):
 
