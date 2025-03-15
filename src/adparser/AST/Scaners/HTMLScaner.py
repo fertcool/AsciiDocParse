@@ -142,6 +142,9 @@ class HTMLScaner(Scaner):
 
     def __create_table(self, html_node, old_ad_parent, go_down_flag):
 
+        if html_node.find("tbody") is None: # admonition fix
+            return self.__create_paragraph(html_node, old_ad_parent, go_down_flag)
+
         if html_node.find("thead") is not None:
             head = html_node.find("thead")
 
