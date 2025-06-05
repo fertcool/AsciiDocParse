@@ -1,0 +1,92 @@
+= Title
+
+Preambule par
+
+[source, python]
+----
+src_pre
+----
+
+image::pre_im[]
+
+== s1
+****
+sb_par_s1
+====
+ex_par_s1 link:link_sb_s1[]
+
+video::ex_vid_s1[]
+....
+listi_par_s1
+....
+====
+audio::sb_aud_s1[]
+****
+[quote, s1_q]
+quote_s1
+
+== s2
+*bold_s2* par_s2
+
+[cols="1"]
+|===
+|s2 table 1
+|s2 table 2
+|===
+
+video::vid_s2[]
+
+=== s21
+
+NOTE: s21_note
+
+link:google.com[]
+
+* s21l1
+** s21l2
+
+_it_s21_
+
+== s3
+
+====
+image::im_ex_s3[]
+[cols="1"]
+|===
+|s3 ex table 1
+|s3 ex table 2
+|===
+====
+
+[quote, s3]
+s3 quote
+
+
+=== s31
+
+[source, c++]
+----
+src_s31
+----
+
+TIP: s31 tip
+
+`msp_s31` <- par_s31
+
+video::vid_s31[]
+
+==== s311
+audio::aud_s311[]
+par_s311
+
+[WARNING]
+====
+_it_war_s311_
+
+* s311l1
+** s311l2
+
+====
+
+== s4
+par_s4

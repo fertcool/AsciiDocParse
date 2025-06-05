@@ -1,0 +1,138 @@
+= AsciiDoc full syntax
+
+== Paragraphs
+
+Paragraphs don't require any special markup in AsciiDoc. A paragraph is just one or more lines of consecutive text.
+
+Paragraph with link https://www.google.com/[Google]
+
+Paragraph with image image:im[]
+
+Paragraph with \n +
+After\n
+
+=== Literal
+
+ A sequence of lines that begin with at least one space is a literal paragraph.
+ Literal paragraphs are treated as preformatted text.
+ The text is shown in a fixed-width font
+ and endlines are preserved.
+
+=== Sidebar
+
+****
+AsciiDoc was first released in Nov 2002 by Stuart Rackham. It was designed from the start to be a shorthand syntax for producing professional documents like DocBook and LaTeX.
+****
+
+=== Example & nested Listing
+
+====
+Here's a sample AsciiDoc document:
+
+[listing]
+....
+= Title of Document
+Doc Writer
+:toc:
+
+This guide provides...
+....
+
+The document header is useful, but not required.
+====
+
+=== Quote
+
+[quote, Abraham Lincoln, Soldiers' National Cemetery Dedication]
+____
+Four score and seven years ago our fathers brought forth on this continent a new nation...
+____
+ 
+=== Admonition
+
+NOTE: An admonition paragraph draws the reader's attention to auxiliary information. Its purpose is determined by the label at the beginning of the paragraph.
+
+TIP: Pro tip...
+
+IMPORTANT: Don't forget...
+
+WARNING: Watch out for...
+
+CAUTION: Ensure that...
+
+== Formatted Text
+
+_italic phrase_ *bold phrase* `monospace phrase`
+
+== Lists
+
+* level 1
+** level 2
+*** level 3
+**** level 4
+***** level 5
+* level 1
+
+break
+
+. Step 1
+. Step 2
+.. Step 2a
+.. Step 2b
+. Step 3
+
+== Links
+
+http://asciidoctor.org - automatic!
+
+link:index.html[Docs]
+
+== Images
+
+image::http://asciidoctor.org/images/octocat.jpg[GitHub mascot]
+
+Click image:icons/play.png[Play, title="Play"] to get the party started.
+
+== Videos
+
+video::video_file.mp4[]
+
+
+== Audios 
+
+audio::ocean-waves.wav[]
+
+
+== Source Code
+
+[source,python]
+----
+from adparser import Parser
+my_file = open(test.adoc)
+parser = Parser(my_file)
+----
+
+  
+== Tables
+
+[cols="1,1,1,1"]
+|===
+|Column 1 |Column 2 |Column 3 |Column 4
+
+|Cell in column 1
+|Cell in column 2
+|Cell in column 3
+|Cell in column 4
+|===
+
+[cols="1,1"]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|===
