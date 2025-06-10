@@ -1,0 +1,355 @@
+= Quick Start: Parsing AsciiDoc with Python
+
+The adparser library for Python provides powerful capabilities for working with AsciiDoc documents. In this Quick Start, you'll learn how to use the library's main functions to extract various elements from an AsciiDoc document.
+
+== Installation
+Install the asciidoc library using pip:
+[source,bash]
+pip install adparser
+
+It is also necessary that *asciidoctor* is preinstalled in the system. You can find out how to do this by following the link https://asciidoctor.org/#installation . Before using the library, make sure that the asciidoctor path is in the _PATH_.
+
+
+== Extracting Document Elements
+The asciidoc library can extract the following elements from an AsciiDoc document:
+
+* text lines - the paragraph element are made up of it
+* link
+* paragraphs
+* headings
+* lists
+* source blocks
+* tables
+* audio, video, and images.
+
+To access these elements, you can use the Parser object.
+
+== Parser object
+
+To start parsing, we need to create Parser object:
+
+[source, python]
+----
+from adparser import Parser
+my_file = open("test.adoc")
+parser = Parser(my_file)
+----
+
+
+
+== Parser methods
+
+To work with each of the document elements described above, the Parser object has its own methods:
+
+* text_lines()
+* links()
+* paragraphs()
+* headings
+* lists
+* source_blocks()
+* tables()
+* audios()
+* images()
+* videos()
+
+=== Example
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+This is a paragraph.
+
+== Section 1
+
+This is another paragraph.
+
+[source,python]
+print("Hello, World!")
+
+[NOTE]
+This is a note.
+
+image::image.png[]
+
+----
+
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test.adoc")
+... parser = Parser(my_file)
+
+>>> for docelem in parser.headings():
+...     print(docelem.data)
+'Document Title'
+'Section 1'
+>>> for docelem in parser.source_blocks():
+...     print(docelem.data)
+...     print(docelem.styles)
+'print("Hello, World!")'
+['listingblock', 'python']
+
+----
+
+
+The functions return an iterators for the objects-elements of the document.  They store the following attributes:
+
+* data: The data associated with the element. Usually text, but in the case of tables, you can get a dictionary (see the example at the end of the readme).
+* section: List of sections of the document the element belongs to
+* styles: List of styles of the object
+* attribute (*only for links*): text of the link
+
+List of styles:
+
+* text_line
+** italic
+** bold
+** monospace
+
+* source
+** source languages
+* for all elements admonition styles
+** note
+** tip
+** caution
+** warning
+* for all elements area style
+** sidebarblock
+** exampleblock
+** quoteblock
+** listningblock
+** literalblock
+
+You can get the text from the paragraph object only through the *get_text()* method. It has a url_opt parameter.
+
+url_opt can be:
+
+* 'show_urls'
+* 'hide_urls'
+
+This option can hide the url of a link ,hyperlink, media src(image, audio, video) or show it. The default is 'hide_urls'
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+You can also use https://www.macports.org[MacPorts], another package manager for macOS, to install Asciidoctor.
+
+If you dont have MacPorts on your computer, complete the https://www.macports.org/install.php[installation instructions] first.
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test.adoc")
+... parser = Parser(my_file)
+
+>>> for docelem in parser.paragraphs():
+...     print(docelem.get_text())
+'You can also use MacPorts, another package manager for macOS, to install Asciidoctor.'
+'If you dont have MacPorts on your computer, complete the installation instructions first.'
+>>> for docelem in parser.paragraphs():
+...     print(docelem.get_text('show_urls'))
+'You can also use https://www.macports.org[MacPorts], another package manager for macOS, to install Asciidoctor.'
+'If you dont have MacPorts on your computer, complete the https://www.macports.org/install.php[installation instructions] first.'
+
+
+----
+
+You can set a named *style* and *section* parameters for Parser methods for a more accurate selection.
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+== Python
+
+[source,python]
+print("Hello, World!")
+
+== C++
+
+[source,cpp]
+std::cout << "Hello, World!";
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test.adoc")
+... parser = Parser(my_file)
+
+>>> for docelem in parser.source_blocks(['cpp']):
+...     print(docelem.data)
+...     print(docelem.styles)
+'std::cout << "Hello, World!";'
+['listingblock', 'cpp']
+>>> for docelem in parser.source_blocks([], ['Python']):
+...     print(docelem.data)
+
+'print("Hello, World!")'
+----
+Styles and sections are filtered by passing lists. They store the necessary styles or sections. The selection takes place for objects whose style and section attributes have elements of the passed lists as a subset.
+
+If you pass the list of sections ['C++', 'Python'] in the example above, nothing will be output, because there is no code object that is both in the C++ section and in the Python section.
+
+[CAUTION]
+====
+Features of working with the parser:
+
+* The level 0 section can only be 1 (and it must exist)
+* Only the text is extracted from the tables and lists
+* Nested tables cannot be used
+====
+=== How get tables:
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+[cols="1,1"]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|===
+
+----
+
+The table objects also have the *data* attribute which stores the dictionary
+
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test.adoc")
+... parser = Parser(my_file)
+>>> elemiter = parser.tables()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data)
+{'col1':['Cell in column 1, row 1', 'Cell in column 1, row 2', 'Cell in column 1, row 3'], 'col2':['Cell in column 2, row 1', 'Cell in column 2, row 2', 'Cell in column 2, row 3']}
+
+----
+Keys with the names "col1" and "col2" were automatically created
+
+Using the *to_dict()* and *to_matrix()* methods, you can change the data attribute to a dictionary or matrix, respectively
+
+[source,asciidoc]
+.test1.adoc
+----
+
+= Document Title
+
+[cols="1,1,1,1"]
+|===
+|Column 1 |Column 2 |Column 3 |Column 4
+
+|Cell in column 1
+|Cell in column 2
+|Cell in column 3
+|Cell in column 4
+|===
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test1.adoc")
+... parser = Parser(my_file)
+>>> elemiter = parser.tables()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data["Column 1"])
+["Cell in column 1"]
+>>> elemiter.to_matrix()
+>>> print(elemiter.data[0][0])
+'Column 1'
+>>> print(elemiter.data[0][1])
+'Cell in column 1'
+----
+The first element in the column becomes the column name (in matrix)
+
+=== get_near() method
+
+To access the closest element to the current one, there is method get_near. The accepted parameters are a string with the name of the required element and a string with the direction: 'up' or 'down'.
+
+[source,asciidoc]
+.test.adoc
+----
+
+= Document Title
+
+This is a paragraph.
+
+== Section 1
+
+This is another paragraph.
+
+[source,python]
+print("Hello, World!")
+
+[NOTE]
+This is a note.
+
+image::image.png[]
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test.adoc")
+... parser = Parser(my_file)
+>>> for docelem in parser.source_blocks():
+...     up_heading = docelem.get_near("heading", direction='up')
+...     print(up_heading.data)
+...     down_image = docelem.get_near("image", direction='down')
+...     print(down_image.data)
+'Section 1'
+'image.png'
+----
+
+
+[source,asciidoc]
+.test2.adoc
+----
+= Document Title
+
+=====
+Here's a sample AsciiDoc document:
+
+-----
+= Document Title
+
+Content goes here.
+-----
+
+The document header is useful, but not required.
+=====
+
+----
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test2.adoc")
+... parser = Parser(my_file)
+>>> for docelem in parser.paragraphs(style=['listingblock']):
+...     up_heading = docelem.get_near("paragraph", direction='up')
+...     print(up_heading.get_text())
+
+'Here’s a sample AsciiDoc document:'
+----
+You can also set a named style parameter for these methods.
