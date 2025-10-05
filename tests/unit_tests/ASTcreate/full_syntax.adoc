@@ -66,6 +66,7 @@ _italic phrase_ *bold phrase* `monospace phrase`
 
 == Lists
 
+.l1
 * level 1
 ** level 2
 *** level 3
@@ -75,6 +76,7 @@ _italic phrase_ *bold phrase* `monospace phrase`
 
 break
 
+.l2
 . Step 1
 . Step 2
 .. Step 2a
@@ -89,23 +91,27 @@ link:index.html[Docs]
 
 == Images
 
+.img
 image::http://asciidoctor.org/images/octocat.jpg[GitHub mascot]
 
 Click image:icons/play.png[Play, title="Play"] to get the party started.
 
 == Videos
 
+.vid
 video::video_file.mp4[]
 
 
 == Audios 
 
+.aud
 audio::ocean-waves.wav[]
 
 
 == Source Code
 
 [source,python]
+.pyt
 ----
 from adparser import Parser
 my_file = open(test.adoc)
@@ -115,6 +121,7 @@ parser = Parser(my_file)
   
 == Tables
 
+.T1
 [cols="1,1,1,1"]
 |===
 |Column 1 |Column 2 |Column 3 |Column 4
@@ -125,6 +132,7 @@ parser = Parser(my_file)
 |Cell in column 4
 |===
 
+.T2
 [cols="1,1"]
 |===
 |Cell in column 1, row 1

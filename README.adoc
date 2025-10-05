@@ -208,6 +208,53 @@ Features of working with the parser:
 * Only the text is extracted from the tables and lists
 * Nested tables cannot be used
 ====
+
+=== How work with block titles:
+
+It is possible to get a title for table, lists, source, image, video and audio blocks.
+
+[source,asciidoc]
+.test.adoc
+----
+= Document Title
+
+== Python
+
+[source,python]
+.python
+print("Hello, World!")
+
+== Table 
+
+.T1
+[cols="1,1"]
+|===
+|Cell in column 1, row 1
+|Cell in column 2, row 1
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|===
+----
+
+[source,python]
+----
+>>> from adparser import Parser
+... my_file = open("test.adoc")
+... parser = Parser(my_file)
+>>> elemiter = parser.tables()
+>>> elemiter = next(elemiter)
+>>>  print(elemiter.title)
+Table 1. T1
+>>> elemiter = parser.source_blocks()
+>>> elemiter = next(elemiter)
+>>>  print(elemiter.title)
+python
+----
+
 === How get tables:
 
 [source,asciidoc]

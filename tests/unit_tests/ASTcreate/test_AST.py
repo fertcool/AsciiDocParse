@@ -159,13 +159,16 @@ class TestAST:
         # first list
         first_list = list_sect._children[1]
         check.is_instance(first_list, List)
-        check.equal(first_list.data, "level 1\n\n\n\nlevel 2\n\n\n\nlevel 3\n\n\n\nlevel 4"
+        check.equal(first_list.data, "\n\n\nlevel 1\n\n\n\nlevel 2\n\n\n\nlevel 3\n\n\n\nlevel 4"
                                      "\n\n\n\nlevel 5\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nlevel 1")
+        check.equal(first_list.title, "l1")
+
         # second list
         second_list = list_sect._children[3]
         check.is_instance(second_list, List)
-        check.equal(second_list.data, "Step 1\n\n\nStep 2\n\n\n\nStep 2a\n\n\nStep 2b"
+        check.equal(second_list.data, "\n\n\nStep 1\n\n\nStep 2\n\n\n\nStep 2a\n\n\nStep 2b"
                                       "\n\n\n\n\n\nStep 3")
+        check.equal(second_list.title, "l2")
 
     def test_links(self, section_dict):
         link_sect = section_dict[('AsciiDoc full syntax', 'Links')]
@@ -187,6 +190,8 @@ class TestAST:
         first_image = image_sect._children[1]
         check.is_instance(first_image, Image)
         check.equal(first_image.data, 'http://asciidoctor.org/images/octocat.jpg')
+        check.equal(first_image.title, "Figure 1. img")
+        
         # image in paragraph
         second_image = image_sect._children[2]._children[1]
         check.is_instance(second_image, Image)
@@ -197,12 +202,14 @@ class TestAST:
         video = vid_sect._children[1]
         check.is_instance(video, Video)
         check.equal(video.data, "video_file.mp4")
+        check.equal(video.title, "vid")
 
     def test_audios(self, section_dict):
         aud_sect = section_dict[('AsciiDoc full syntax', 'Audios')]
         audio = aud_sect._children[1]
         check.is_instance(audio, Audio)
         check.equal(audio.data, "ocean-waves.wav")
+        check.equal(audio.title, "aud")
 
     def test_source(self, section_dict):
         source_sect = section_dict[('AsciiDoc full syntax', 'Source Code')]
@@ -210,6 +217,7 @@ class TestAST:
         check.is_instance(source, SourceBlock)
         check.equal(source.data, "from adparser import Parser\nmy_file = open(test.adoc)\nparser = Parser(my_file)")
         check.equal(source.styles[-1], "python")
+        check.equal(source.title, "pyt")
 
     def test_tables(self, section_dict):
         table_sect = section_dict[('AsciiDoc full syntax', 'Tables')]
@@ -218,9 +226,13 @@ class TestAST:
         check.is_instance(table_named, Table)
         check.equal(table_named.data, {'Column 1': ['Cell in column 1'], 'Column 2': ['Cell in column 2'],
                                        'Column 3': ['Cell in column 3'], 'Column 4': ['Cell in column 4']})
+        check.equal(table_named.title, "Table 1. T1")
+
         # matrix table
         table_matrix = table_sect._children[2]
         check.is_instance(table_matrix, Table)
         check.equal(table_matrix.data, {
             'col1': ['Cell in column 1, row 1', 'Cell in column 1, row 2', 'Cell in column 1, row 3'],
             'col2': ['Cell in column 2, row 1', 'Cell in column 2, row 2', 'Cell in column 2, row 3']})
+        check.equal(table_matrix.title, "Table 2. T2")
+

@@ -183,8 +183,9 @@ class Heading(Block):
 
 class List(Block):
 
-    def __init__(self, data, section, parent, style):
+    def __init__(self, data, section, parent, style, title=None):
         super().__init__(data, section, parent, style)
+        self.title = title
 
     def accept(self, visitor):
         visitor.visit_list(self)
@@ -192,9 +193,9 @@ class List(Block):
 
 class SourceBlock(Block):
 
-    def __init__(self, data, section, parent, style):
+    def __init__(self, data, section, parent, style, title=None):
         super().__init__(data, section, parent, style)
-
+        self.title = title
 
     def accept(self, visitor):
         visitor.visit_source(self)
@@ -202,8 +203,9 @@ class SourceBlock(Block):
 
 class Table(Block):
 
-    def __init__(self, diction, section, parent, style=None):
+    def __init__(self, diction, section, parent, style=None, title=None):
         super().__init__(diction, section, parent, style)
+        self.title = title
 
     def to_matrix(self):
         if not isinstance(self.data, list):
@@ -228,8 +230,9 @@ class Admonition(Block):
 
 class Audio(Block):
 
-    def __init__(self, data, section, parent, style):
+    def __init__(self, data, section, parent, style, title=None):
         super().__init__(data, section, parent, style)
+        self.title = title
 
     def accept(self, visitor):
         visitor.visit_audio(self)
@@ -237,8 +240,9 @@ class Audio(Block):
 
 class Image(Block):
 
-    def __init__(self, data, section, parent, style):
+    def __init__(self, data, section, parent, style, title=None):
         super().__init__(data, section, parent, style)
+        self.title = title
 
     def accept(self, visitor):
         visitor.visit_image(self)
@@ -246,8 +250,9 @@ class Image(Block):
 
 class Video(Block):
 
-    def __init__(self, data, section, parent, style):
+    def __init__(self, data, section, parent, style, title=None):
         super().__init__(data, section, parent, style)
+        self.title = title
 
     def accept(self, visitor):
         visitor.visit_video(self)

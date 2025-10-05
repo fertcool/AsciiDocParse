@@ -114,6 +114,14 @@ class HTMLScaner(Scaner):
                           old_ad_parent,
                           self.style_list)
 
+    def _get_title_from_html_node(self, html_node) -> str | None:
+        title = html_node.xpath(".//*[@class='title']")
+        if title:
+            title_text = title[0].text_content()
+        else:
+            title_text = None
+        return title_text
+    
     def __create_delimeter(self, html_node, old_ad_parent):
         self.__push_style(html_node.get("class"), 0)
 
@@ -124,9 +132,10 @@ class HTMLScaner(Scaner):
         self._go_down_flag = True
 
         if html_node.get("class") == 'listingblock' and html_node.find('.//code') is not None:
-            ASTree.add_sub_element(new_ad_parent,
-                                   self.__create_source(html_node.find('.//code'), new_ad_parent)
-                                   )
+            title = self._get_title_from_html_node(html_node)
+            source_block = self.__create_source(html_node.find('.//code'), new_ad_parent)
+            source_block.title = title
+            ASTree.add_sub_element(new_ad_parent, source_block)
             self._go_down_flag = False
 
         # in the style of a quote, we add the author to the styles attribute
@@ -139,8 +148,10 @@ class HTMLScaner(Scaner):
             self._go_down_flag = False
 
         return new_ad_parent
-
+     
     def __create_table(self, html_node, old_ad_parent):
+
+        title = self._get_title_from_html_node(html_node)
 
         if html_node.find("tbody") is None: # admonition fix
             return self.__create_paragraph(html_node, old_ad_parent)
@@ -167,21 +178,27 @@ class HTMLScaner(Scaner):
 
         return Table(table_dict, old_ad_parent.section,
                      old_ad_parent,
-                     old_ad_parent.styles)
+                     old_ad_parent.styles, title)
 
     def __create_list(self, html_node, old_ad_parent):
+
+        title = self._get_title_from_html_node(html_node)
 
         self._go_down_flag = False
         html_text = html_node.text_content()
         html_text = html_text.lstrip('\n')
         html_text = html_text.rstrip('\n')
+
+        if title is not None: # remove title
+            html_text = html_text.replace(title, "", 1)
+
         return List(html_text,
                     old_ad_parent.section,
                     old_ad_parent,
-                    old_ad_parent.styles)
+                    old_ad_parent.styles, title)
 
     def __create_source(self, html_node, old_ad_parent):
-
+        
         self._go_down_flag = False
         code_style = old_ad_parent.styles.copy()
         code_style.append(html_node.get('data-lang'))
@@ -192,28 +209,31 @@ class HTMLScaner(Scaner):
                            code_style)
 
     def __create_image(self, html_node, old_ad_parent):
+        title = self._get_title_from_html_node(html_node)
         self._go_down_flag = False
         srcnode = html_node.xpath("..//*[@src]")[0]
         return Image(srcnode.get("src"),
                      old_ad_parent.section,
                      old_ad_parent,
-                     old_ad_parent.styles)
+                     old_ad_parent.styles, title)
 
     def __create_audio(self, html_node, old_ad_parent):
+        title = self._get_title_from_html_node(html_node)
         self._go_down_flag = False
         srcnode = html_node.xpath(".//*[@src]")[0]
         return Audio(srcnode.get("src"),
                      old_ad_parent.section,
                      old_ad_parent,
-                     old_ad_parent.styles)
+                     old_ad_parent.styles, title)
 
     def __create_video(self, html_node, old_ad_parent):
+        title = self._get_title_from_html_node(html_node)
         self._go_down_flag = False
         srcnode = html_node.xpath(".//*[@src]")[0]
         return Video(srcnode.get("src"),
                      old_ad_parent.section,
                      old_ad_parent,
-                     old_ad_parent.styles)
+                     old_ad_parent.styles, title)
 
     def __create_link(self, html_node, old_ad_parent):
         self._go_down_flag = False
@@ -279,7 +299,6 @@ class HTMLScaner(Scaner):
 
     def __create_paragraph(self, html_node, old_ad_parent):
 
-
         new_ad_parent = Paragraph(None,
                                   old_ad_parent.section,
                                   old_ad_parent,
@@ -332,8 +351,6 @@ class HTMLScaner(Scaner):
         elif html_node.get("class") in ['sidebarblock', 'exampleblock', 'quoteblock', 'listingblock',
 
                                         'literalblock', 'literalblock output']:
-            if html_node.get('class') == 'exampleblock':
-                pass
             new_ad_parent = self.__create_delimeter(html_node, old_ad_parent)
 
         # ---- 4 - the table element? -------
