@@ -221,6 +221,7 @@ class TestAST:
 
     def test_tables(self, section_dict):
         table_sect = section_dict[('AsciiDoc full syntax', 'Tables')]
+
         # table with named columns
         table_named = table_sect._children[1]
         check.is_instance(table_named, Table)
@@ -235,4 +236,77 @@ class TestAST:
             'col1': ['Cell in column 1, row 1', 'Cell in column 1, row 2', 'Cell in column 1, row 3'],
             'col2': ['Cell in column 2, row 1', 'Cell in column 2, row 2', 'Cell in column 2, row 3']})
         check.equal(table_matrix.title, "Table 2. T2")
+        
+        # --------------------------------
+        # span tables with/without headers
+        # --------------------------------
+
+        table_span_wo_header_1 = table_sect._children[3]
+        table_span_w_header_1 = table_sect._children[8]
+        check.is_instance(table_span_wo_header_1, Table)
+        real_dict = {'Column 1, header row': ['This cell spans columns 1, 2, and 3 because its specifier contains a span of 3+', 
+                                              'Cell in column 1, row 3'], 
+                     'Column 2, header row': ['This cell spans columns 1, 2, and 3 because its specifier contains a span of 3+', 
+                                              'Cell in column 2, row 3'], 
+                     'Column 3, header row': ['This cell spans columns 1, 2, and 3 because its specifier contains a span of 3+', 
+                                              'Cell in column 3, row 3'], 
+                     'Column 4, header row': ['Cell in column 4, row 2', 
+                                              'Cell in column 4, row 3']}
+        check.equal(table_span_wo_header_1.data, real_dict)
+        check.equal(table_span_w_header_1.data, real_dict)
+
+        table_span_wo_header_2 = table_sect._children[4]
+        table_span_w_header_2 = table_sect._children[9]
+        check.is_instance(table_span_wo_header_2, Table)
+        real_dict = {'Column 1, header row': ['This cell spans rows 2 and 3 because its specifier contains a span of .2+', 
+                                              'This cell spans rows 2 and 3 because its specifier contains a span of .2+', 
+                                              'Cell in column 1, row 4'], 
+                     'Column 2, header row': ['Cell in column 2, row 2', 
+                                              'Cell in column 2, row 3', 
+                                              'Cell in column 2, row 4']}
+        check.equal(table_span_wo_header_2.data, real_dict)
+        check.equal(table_span_w_header_2.data, real_dict)
+        
+        table_span_wo_header_3 = table_sect._children[5]
+        table_span_w_header_3 = table_sect._children[10]
+        check.is_instance(table_span_wo_header_3, Table)
+        real_dict = {'Column 1, header row': ['full width 4+'], 
+                     'Column 2, header row': ['full width 4+'], 
+                     'Column 3, header row': ['full width 4+'], 
+                     'Column 4, header row': ['full width 4+']}
+        check.equal(table_span_wo_header_3.data, real_dict)
+        check.equal(table_span_w_header_3.data, real_dict)
+        
+        table_span_wo_header_4 = table_sect._children[6]
+        table_span_w_header_4 = table_sect._children[11]
+        check.is_instance(table_span_wo_header_4, Table)
+        real_dict = {'Column 1, header row': ['Cell in column 1, row 2', 
+                                              'Cell in column 1, row 3', 
+                                              'Cell in column 1, row 4'], 
+                     'Column 2, header row': ['This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                                              'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                                              'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+'], 
+                     'Column 3, header row': ['This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                                              'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                                              'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+'], 
+                     'Column 4, header row': ['Cell in column 4, row 2', 
+                                              'Cell in column 4, row 3', 
+                                              'Cell in column 4, row 4']}
+        check.equal(table_span_wo_header_4.data, real_dict)
+        check.equal(table_span_w_header_4.data, real_dict)
+
+        table_span_wo_header_5 = table_sect._children[7]
+        table_span_w_header_5 = table_sect._children[12]
+        check.is_instance(table_span_wo_header_5, Table)
+        real_dict = {'Column 1, header row': ['Cell in column 1, row 1', 
+                                              'full width 4+'], 
+                     'Column 2, header row': ['Cell in column 2, row 1', 
+                                              'full width 4+'], 
+                     'Column 3, header row': ['Cell in column 3, row 1', 
+                                              'full width 4+'], 
+                     'Column 4, header row': ['Cell in column 4, row 1', 
+                                              'full width 4+']}
+        check.equal(table_span_wo_header_5.data, real_dict)
+        check.equal(table_span_w_header_5.data, real_dict)
+        
 

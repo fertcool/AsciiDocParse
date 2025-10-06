@@ -5,6 +5,7 @@ from lxml import html
 from adparser.AST.Scaners.Scaner import Scaner
 from adparser.AST.Blocks.Blocks import *
 from adparser.AST.ASTree import ASTree
+from queue import Queue
 
 
 class HTMLScaner(Scaner):
@@ -150,29 +151,112 @@ class HTMLScaner(Scaner):
         return new_ad_parent
      
     def __create_table(self, html_node, old_ad_parent):
-
+        """
+            This implementation currently supports storing tables 
+            with colspan and rowspan only if the header is clearly defined in it:
+                1) It should list all the columns
+                2) If the header is not explicitly specified, the first row will be used instead.
+                3) header columns should not have colspan or rowspan attributes
+        """
         title = self._get_title_from_html_node(html_node)
 
         if html_node.find("tbody") is None: # admonition fix
             return self.__create_paragraph(html_node, old_ad_parent)
+        
+        cur_span_dict = {} # { column_name: [remain_rows, cell_text], ... }
+                           # column_name - in the current row iteration, it contains a joined cell
+                           # remain_rows -> deincrements each row
+                           # if remain_rows == 0 -> column_name key deleting
+        def cur_span_update(tcol, column_name: str, header_columns: list[str]):
+            """if tcol has colspan or rowspan attributes:
+                    add columns to cur_span_dict"""
+            def get_span(name: str):
+                span = tcol.get(name)
+                if span is None:
+                    span = 1
+                else:
+                    span = int(span)
+                return span
+            
+            rowspan = get_span("rowspan")
+            colspan = get_span("colspan")
 
-        if html_node.find("thead") is not None:
+            if colspan > 1 or rowspan > 1:
+                colspan = int(colspan)
+
+                # search column in header_columns
+                for idx, column in enumerate(header_columns):
+                    if column == column_name:
+                        start_idx = idx
+                        break
+                # add colspan columns in cur_span_dict
+                joined_columns = header_columns[start_idx:start_idx+colspan]
+                for column in joined_columns:
+                    cur_span_dict[column] = [rowspan, tcol.text_content()]
+
+        def cur_span_decrement():
+            """decrement remain_rows in cur_span_dict:
+                if remain_rows == 0 -> column_name key deleting"""
+            del_columns = []
+            for column in cur_span_dict:
+                cur_span_dict[column][0] -= 1
+                if cur_span_dict[column][0] == 0:
+                    del_columns.append(column)
+            for column in del_columns:
+                del cur_span_dict[column]
+
+        def table_span_row_processing(tr, table_dict: dict[str, list[str]], header_columns: list[str]):
+            """add to table_dict row data"""       
+            # not joined cells 
+            usual_cells = Queue()
+            for cell in tr.findall(".//td"):
+                usual_cells.put(cell)
+
+            for column in header_columns:
+                if column not in cur_span_dict:
+                    tcol = usual_cells.get()
+                    cur_span_update(tcol, column, header_columns)
+                    table_dict[column].append(tcol.text_content())
+                else:
+                    table_dict[column].append(cur_span_dict[column][1])
+            cur_span_decrement()
+
+        # if table has explicitly set header
+        if html_node.find("thead") is not None: 
             head = html_node.find("thead")
-
-            table_dict = {x.text_content(): [] for x in head.findall(".//th")}
-
+            header_columns = [x.text_content() for x in head.findall(".//th")]
+            table_dict = {x: [] for x in header_columns}
             body = html_node.find("tbody")
 
             for tr in body.findall(".//tr"):
-                for dek, tcol in zip(table_dict.keys(), tr.findall(".//td")):
-                    table_dict[dek].append(tcol.text_content())
+                table_span_row_processing(tr, table_dict, header_columns)
 
-        else:
+        # if table hasn`t explicitly set header              
+        else: 
             body = html_node.find("tbody")
-            table_dict = {'col' + str(i): [] for i in range(1, len(body.find(".//tr").findall(".//td")) + 1)}
-            for tr in body.findall(".//tr"):
-                for dcolkey, td in zip(table_dict.keys(), tr.findall(".//td")):
-                    table_dict[dcolkey].append(td.text_content())
+
+            # table without header and without span attrs
+            #  -> table_dict = {col1:[...], col2: [...], ...}
+            if not body.xpath(".//*[@rowspan] | .//*[@colspan]"): 
+                table_dict = {'col' + str(i): [] for i in range(1, len(body.find(".//tr").findall(".//td")) + 1)}
+                for tr in body.findall(".//tr"):
+                    for dcolkey, td in zip(table_dict.keys(), tr.findall(".//td")):
+                        table_dict[dcolkey].append(td.text_content())
+
+            # table without header but with span attrs
+            else:
+                header_columns = []
+                table_dict = {}
+
+                body = html_node.find("tbody")
+
+                for tr in body.findall(".//tr"):
+                    if not header_columns: # header = first row
+                        header_columns = [x.text_content() for x in tr.findall(".//td")]
+                        table_dict = {x: [] for x in header_columns}
+                        continue
+
+                    table_span_row_processing(tr, table_dict, header_columns)
 
         self._go_down_flag = False
 

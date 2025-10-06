@@ -1,4 +1,8 @@
+:toc:
+
 = Quick Start: Parsing AsciiDoc with Python
+
+
 
 The adparser library for Python provides powerful capabilities for working with AsciiDoc documents. In this Quick Start, you'll learn how to use the library's main functions to extract various elements from an AsciiDoc document.
 
@@ -211,7 +215,14 @@ Features of working with the parser:
 
 === How work with block titles:
 
-It is possible to get a title for table, lists, source, image, video and audio blocks.
+It is possible to get a title for blocks by **title** attribute:
+
+* table 
+* lists 
+* source 
+* image
+* video
+* audio
 
 [source,asciidoc]
 .test.adoc
@@ -330,6 +341,218 @@ Using the *to_dict()* and *to_matrix()* methods, you can change the data attribu
 ----
 The first element in the column becomes the column name (in matrix)
 
+==== Span Tables
+
+This implementation currently supports storing tables 
+with colspan and rowspan. 
+
+[source,asciidoc]
+.test1.adoc
+----
+
+= Document Title
+
+|===
+|Column 1, header row |Column 2, header row |Column 3, header row |Column 4, header row
+
+3+|This cell spans columns 1, 2, and 3 because its specifier contains a span of `3+`
+|Cell in column 4, row 2
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|Cell in column 3, row 3
+|Cell in column 4, row 3
+|===
+
+----
+
+|===
+|Column 1, header row |Column 2, header row |Column 3, header row |Column 4, header row
+
+3+|This cell spans columns 1, 2, and 3 because its specifier contains a span of `3+`
+|Cell in column 4, row 2
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+|Cell in column 3, row 3
+|Cell in column 4, row 3
+|===
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test1.adoc")
+... parser = Parser(my_file)
+>>> elemiter = parser.tables()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data)
+{'Column 1, header row': 
+    ['This cell spans columns 1, 2, and 3 because its specifier contains a span of 3+', 
+     'Cell in column 1, row 3'], 
+ 'Column 2, header row': 
+    ['This cell spans columns 1, 2, and 3 because its specifier contains a span of 3+', 
+     'Cell in column 2, row 3'], 
+ 'Column 3, header row': 
+    ['This cell spans columns 1, 2, and 3 because its specifier contains a span of 3+', 
+     'Cell in column 3, row 3'], 
+ 'Column 4, header row': 
+    ['Cell in column 4, row 2', 
+     'Cell in column 4, row 3']}
+----
+
+[source,asciidoc]
+.test1.adoc
+----
+
+= Document Title
+
+|===
+|Column 1, header row |Column 2, header row
+
+.2+|This cell spans rows 2 and 3 because its specifier contains a span of `.2+`
+|Cell in column 2, row 2
+
+|Cell in column 2, row 3
+
+|Cell in column 1, row 4
+|Cell in column 2, row 4
+|===
+
+----
+
+|===
+|Column 1, header row |Column 2, header row
+
+.2+|This cell spans rows 2 and 3 because its specifier contains a span of `.2+`
+|Cell in column 2, row 2
+
+|Cell in column 2, row 3
+
+|Cell in column 1, row 4
+|Cell in column 2, row 4
+|===
+
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test1.adoc")
+... parser = Parser(my_file)
+>>> elemiter = parser.tables()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data)
+{'Column 1, header row': ['This cell spans rows 2 and 3 because its specifier contains a span of .2+', 
+                          'This cell spans rows 2 and 3 because its specifier contains a span of .2+', 
+                          'Cell in column 1, row 4'], 
+ 'Column 2, header row': ['Cell in column 2, row 2', 
+                          'Cell in column 2, row 3', 
+                          'Cell in column 2, row 4']}
+----
+
+[source,asciidoc]
+.test1.adoc
+----
+
+= Document Title
+
+|===
+|Column 1, header row |Column 2, header row |Column 3, header row |Column 4, header row
+
+4.1+|full width 4+
+
+|===
+
+----
+
+|===
+|Column 1, header row |Column 2, header row |Column 3, header row |Column 4, header row
+
+4.1+|full width 4+
+
+|===
+
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test1.adoc")
+... parser = Parser(my_file)
+>>> elemiter = parser.tables()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data)
+{'Column 1, header row': ['full width 4+'], 
+ 'Column 2, header row': ['full width 4+'], 
+ 'Column 3, header row': ['full width 4+'], 
+ 'Column 4, header row': ['full width 4+']}
+----
+
+[source,asciidoc]
+.test1.adoc
+----
+
+= Document Title
+
+|===
+|Column 1, header row |Column 2, header row |Column 3, header row |Column 4, header row
+
+|Cell in column 1, row 2
+2.3+|This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of `2.3+`
+|Cell in column 4, row 2
+
+|Cell in column 1, row 3
+|Cell in column 4, row 3
+
+|Cell in column 1, row 4
+|Cell in column 4, row 4
+|===
+----
+
+|===
+|Column 1, header row |Column 2, header row |Column 3, header row |Column 4, header row
+
+|Cell in column 1, row 2
+2.3+|This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of `2.3+`
+|Cell in column 4, row 2
+
+|Cell in column 1, row 3
+|Cell in column 4, row 3
+
+|Cell in column 1, row 4
+|Cell in column 4, row 4
+|===
+
+[source, python]
+----
+>>> from adparser import Parser
+... my_file = open("test1.adoc")
+... parser = Parser(my_file)
+>>> elemiter = parser.tables()
+>>> elemiter = next(elemiter)
+
+>>>  print(elemiter.data)
+{'Column 1, header row': ['Cell in column 1, row 2', 
+                            'Cell in column 1, row 3', 
+                            'Cell in column 1, row 4'], 
+    'Column 2, header row': ['This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                            'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                            'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+'], 
+    'Column 3, header row': ['This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                            'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+', 
+                            'This cell spans columns 2 and 3 and rows 2, 3, and 4 because its specifier contains a span of 2.3+'], 
+    'Column 4, header row': ['Cell in column 4, row 2', 
+                            'Cell in column 4, row 3', 
+                            'Cell in column 4, row 4']}
+----
+
+
+[WARNING]
+====
+Span Tables can parsing only if the header is clearly defined in it:
+
+    * It should list all the columns
+    * If the header is not explicitly specified, the first row will be used instead.
+    * header columns should not have colspan or rowspan attributes
+====
 === get_near() method
 
 To access the closest element to the current one, there is method get_near. The accepted parameters are a string with the name of the required element and a string with the direction: 'up' or 'down'.
