@@ -34,17 +34,25 @@ class HTMLScaner(Scaner):
     # -------  functions for working with stacks of styles and headers -------
 
     def __push_heading(self, htag, hname):  # hname - name of header tag, hkey, hvalue as above
+        
+        if self.__heading_stack:
+            new_level = int(htag[1])
+            last_level = int(self.__heading_stack[-1][0][1])
 
         if not self.__heading_stack:
             self.__heading_stack.append([htag, hname])
-
         # subheading
-        elif int(htag[1]) > int(self.__heading_stack[-1][0][1]):
+        elif new_level > last_level:
             self.__heading_stack.append([htag, hname])
         # out of the subheadings
-        elif int(htag[1]) < int(self.__heading_stack[-1][0][1]):
-            while int(htag[1]) <= int(self.__heading_stack[-1][0][1]):
+        elif new_level < last_level:
+            # loop of cleaning heading stack
+            while new_level <= last_level:
                 self.__heading_stack.pop()
+                if self.__heading_stack:
+                    last_level = int(self.__heading_stack[-1][0][1])
+                else: 
+                    break
             self.__heading_stack.append([htag, hname])
         # equal levels
         else:
@@ -474,7 +482,9 @@ class HTMLScaner(Scaner):
             new_ad_parent = self.__create_paragraph(html_node, old_ad_parent)
 
         # other with text (also not title - like in admonition)
-        elif not len(html_node) and html_node.text and html_node.get("class") not in ['title']:
+        elif not len(html_node) and html_node.text and html_node.get("class") not in ['title'] and \
+                                                            html_node.get("id") != "header": 
+                                                            # skip \n text_line -> case if file doesnt have 0 header level
             new_ad_parent = self.__create_paragraph(html_node, old_ad_parent)
 
         return new_ad_parent

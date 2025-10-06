@@ -208,7 +208,7 @@ If you pass the list of sections ['C++', 'Python'] in the example above, nothing
 ====
 Features of working with the parser:
 
-* The level 0 section can only be 1 (and it must exist)
+* The level 0 section can only be 1 
 * Only the text is extracted from the tables and lists
 * Nested tables cannot be used
 ====
