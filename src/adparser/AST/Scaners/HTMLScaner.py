@@ -217,7 +217,7 @@ class HTMLScaner(Scaner):
             """add to table_dict row data"""       
             # not joined cells 
             usual_cells = Queue()
-            for cell in tr.findall(".//td"):
+            for cell in tr.findall(".//td")+tr.findall(".//th"):
                 usual_cells.put(cell)
 
             for column in header_columns:
@@ -246,9 +246,10 @@ class HTMLScaner(Scaner):
             # table without header and without span attrs
             #  -> table_dict = {col1:[...], col2: [...], ...}
             if not body.xpath(".//*[@rowspan] | .//*[@colspan]"): 
-                table_dict = {'col' + str(i): [] for i in range(1, len(body.find(".//tr").findall(".//td")) + 1)}
+                table_dict = {'col' + str(i): [] for i in range(1, len(body.find(".//tr").findall(".//td") + 
+                                                                       body.find(".//tr").findall(".//th")) + 1)}
                 for tr in body.findall(".//tr"):
-                    for dcolkey, td in zip(table_dict.keys(), tr.findall(".//td")):
+                    for dcolkey, td in zip(table_dict.keys(), tr.findall(".//td") + tr.findall(".//th")):
                         table_dict[dcolkey].append(td.text_content())
 
             # table without header but with span attrs
