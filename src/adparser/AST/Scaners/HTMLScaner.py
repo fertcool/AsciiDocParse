@@ -526,7 +526,8 @@ class HTMLScaner(Scaner):
                 self.__pop_style()
 
         # remove paragraph with metadata of html
-        if len(self.adtree._children) > 1:
+        last_block = self.adtree._children[-1]
+        if len(self.adtree._children) > 1 and isinstance(last_block, Paragraph):
             self.adtree._children = self.adtree._children[:-1]
 
         return ASTree(self.adtree)

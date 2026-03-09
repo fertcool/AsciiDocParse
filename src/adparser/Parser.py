@@ -2,6 +2,7 @@
 # It has methods that return iterators for the selected type of asciidoc document objects
 
 import os
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -38,7 +39,7 @@ class Parser:
 
         # using OS temp dir
         temp_dir = tempfile.gettempdir()
-        subprocess.run('asciidoctor ' + path + ' -D ' + temp_dir, shell=True)
+        subprocess.run(f'asciidoctor {shlex.quote(path)} -D {shlex.quote(temp_dir)}', shell=True)
 
         # forming the path to the html file that was automatically created by asciidoctor
         file_name = os.path.splitext(os.path.basename(path))[0]
